@@ -5,771 +5,702 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GASTELE UN DIA · Lista de Chequeo UCI</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
   :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --surface2: #1c2230;
-    --border: #2a3444;
-    --text: #e6edf3;
-    --muted: #7d8fa3;
-    --accent: #1e8aff;
-    --accent-soft: rgba(30,138,255,0.12);
-
-    --g: #1aad5e;   /* Glucometrias */
-    --a: #e8a020;   /* Analgesia */
-    --s: #c46ef0;   /* Sedacion */
-    --t: #3bb8f0;   /* Tromboprofilaxis */
-    --e1: #f05454;  /* Elevacion cabecera */
-    --l: #5dcc8a;   /* Liberacion VM */
-    --e2: #f09030;  /* Evacuacion intestinal */
-    --u: #f06090;   /* Ulceras */
-    --n: #a08af0;   /* Nutricion */
-
-    --radius: 8px;
+    --bg: #f0f4f8;
+    --white: #ffffff;
+    --border: #dde3ec;
+    --text: #1a2233;
+    --muted: #6b7a99;
+    --accent: #1a56a0;
+    --accent-light: #e8f0fb;
     --font: 'Inter', sans-serif;
-    --mono: 'JetBrains Mono', monospace;
+    --shadow: 0 1px 4px rgba(0,0,0,0.07);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 14px;
-  }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 13px; }
 
   /* HEADER */
   header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 24px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    background: var(--white);
+    border-bottom: 3px solid var(--accent);
+    position: sticky; top: 0; z-index: 200;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
-
   .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 20px; gap: 10px;
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .logo-circle {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 11px; flex-shrink: 0;
+  }
+  .header-text h1 { font-size: 15px; font-weight: 700; color: var(--accent); }
+  .header-text p { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .header-badges { display: flex; gap: 6px; }
+  .badge { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+  .badge-uci { background: var(--accent); color: #fff; }
+  .badge-udc { background: var(--accent-light); color: var(--accent); }
+
+  .meta-bar {
+    background: var(--accent-light); border-top: 1px solid #c5d8f5;
+    padding: 6px 20px; display: flex; gap: 14px; align-items: center;
+  }
+  .meta-field { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--accent); }
+  .meta-field label { font-weight: 600; white-space: nowrap; }
+  .meta-field input {
+    border: 1px solid #c5d8f5; border-radius: 5px;
+    background: var(--white); color: var(--text);
+    font-family: var(--font); font-size: 11px; padding: 3px 7px;
+  }
+  .meta-field input:focus { outline: none; border-color: var(--accent); }
+  .btn-reset {
+    margin-left: auto; background: transparent;
+    border: 1px solid #c5d8f5; color: var(--muted);
+    font-family: var(--font); font-size: 11px;
+    padding: 3px 10px; border-radius: 5px; cursor: pointer;
+  }
+  .btn-reset:hover { border-color: #c0392b; color: #c0392b; }
+
+  /* TABLE WRAPPER */
+  .table-wrap {
+    overflow-x: auto;
+    padding: 16px 12px;
   }
 
-  .header-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  /* MAIN TABLE */
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 1200px;
+    width: 100%;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
   }
 
-  .badge-uci {
+  /* COLUMN HEADERS — row 1: cama numbers */
+  .th-cama {
     background: var(--accent);
     color: #fff;
-    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 1.5px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    text-transform: uppercase;
-  }
-
-  h1 {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.3px;
-  }
-
-  .header-sub {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 2px;
-    font-family: var(--mono);
-  }
-
-  .header-meta {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .meta-field {
-    display: flex;
-    align-items: center;
-    gap: 6px;
     font-size: 12px;
-    color: var(--muted);
-  }
-
-  .meta-field input {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 4px 8px;
-    width: 120px;
-  }
-
-  .meta-field input:focus { outline: none; border-color: var(--accent); }
-
-  .btn-reset {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: var(--font);
-    font-size: 12px;
-    padding: 5px 12px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: all .15s;
-  }
-  .btn-reset:hover { border-color: #f05454; color: #f05454; }
-
-  /* TABS — CAMAS */
-  .cama-tabs {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    display: flex;
-    gap: 2px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .cama-tabs::-webkit-scrollbar { display: none; }
-
-  .cama-tab {
-    padding: 10px 16px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
+    text-align: center;
+    padding: 8px 4px;
+    border-right: 1px solid rgba(255,255,255,0.15);
     white-space: nowrap;
-    transition: all .15s;
-    position: relative;
-    user-select: none;
+    min-width: 88px;
   }
+  .th-cama:last-child { border-right: none; }
 
-  .cama-tab:hover { color: var(--text); }
-
-  .cama-tab.active {
+  /* PACIENTE ROW */
+  .tr-pac td {
+    background: var(--accent-light);
+    padding: 0;
+    border-right: 1px solid var(--border);
+    border-bottom: 2px solid var(--accent);
+    vertical-align: top;
+  }
+  .tr-pac td:last-child { border-right: none; }
+  .td-label-pac {
+    background: #dbeafe;
+    font-weight: 700; font-size: 10px;
     color: var(--accent);
-    border-bottom-color: var(--accent);
+    padding: 6px 8px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-right: 1px solid var(--border) !important;
+  }
+  .pac-input {
+    width: 100%; border: none; background: transparent;
+    font-family: var(--font); font-size: 11px; color: var(--text);
+    padding: 4px 6px; resize: none; display: block;
+  }
+  .pac-input:focus { outline: none; background: #fff; }
+  .pac-cell { padding: 3px; }
+
+  /* DOMAIN HEADER ROW */
+  .tr-domain td {
+    padding: 6px 8px;
+    font-weight: 700; font-size: 11px;
+    border-right: 1px solid rgba(255,255,255,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    text-align: center;
+    position: sticky;
+    letter-spacing: 0.3px;
+  }
+  .tr-domain td:last-child { border-right: none; }
+  .td-domain-label {
+    text-align: left !important;
+    padding: 6px 10px !important;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .domain-pill-sm {
+    width: 22px; height: 22px; border-radius: 5px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 11px; flex-shrink: 0;
   }
 
-  .cama-tab .progress-dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--border);
-    margin-left: 6px;
+  /* ITEM ROWS */
+  .tr-item td {
+    padding: 0;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
     vertical-align: middle;
-    transition: background .2s;
+  }
+  .tr-item td:last-child { border-right: none; }
+  .tr-item:last-of-type td { border-bottom: 2px solid var(--border); }
+
+  /* LABEL COLUMN */
+  .td-label {
+    background: #f8fafc;
+    padding: 7px 10px;
+    font-size: 11px; font-weight: 500; color: var(--text);
+    border-right: 2px solid var(--border) !important;
+    min-width: 220px; max-width: 260px;
+    line-height: 1.35;
   }
 
-  .cama-tab.has-progress .progress-dot { background: var(--g); }
-  .cama-tab.complete .progress-dot { background: #1aad5e; }
-
-  /* MAIN LAYOUT */
-  .main {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 24px 16px;
+  /* CELL WITH RADIO */
+  .td-cell {
+    text-align: center;
+    padding: 5px 3px;
+    min-width: 88px;
   }
 
-  .cama-panel { display: none; }
-  .cama-panel.active { display: block; }
-
-  /* PACIENTE CARD */
-  .paciente-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-bottom: 20px;
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    align-items: center;
+  /* RADIO PILLS — compact */
+  .radio-group-col {
+    display: flex; flex-direction: column; gap: 3px;
+    align-items: stretch; padding: 3px 4px;
   }
-
-  .paciente-field {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
-    min-width: 160px;
+  .rpill input[type="radio"] { display: none; }
+  .rpill label {
+    display: block; width: 100%;
+    padding: 3px 6px; border-radius: 12px;
+    border: 1.5px solid var(--border);
+    font-size: 10px; font-weight: 500; color: var(--muted);
+    cursor: pointer; transition: all .12s;
+    text-align: center; background: var(--bg);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
+  .rpill label:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .rpill input[type="radio"]:checked + label { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .rpill.green input[type="radio"]:checked + label { background: #16803c; border-color: #16803c; }
+  .rpill.red   input[type="radio"]:checked + label { background: #c0392b; border-color: #c0392b; }
+  .rpill.yellow input[type="radio"]:checked + label { background: #b45309; border-color: #b45309; }
 
-  .paciente-field label {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+  /* CHECKBOX — compact */
+  .chk-cell {
+    display: flex; align-items: center; justify-content: center;
+    height: 100%; min-height: 36px; cursor: pointer;
+    transition: background .1s;
   }
-
-  .paciente-field input {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 13px;
-    padding: 6px 10px;
-    width: 100%;
+  .chk-cell:hover { background: #f0f9f4; }
+  .chk-box {
+    width: 20px; height: 20px; border-radius: 5px;
+    border: 2px solid var(--border); background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s; flex-shrink: 0;
   }
-  .paciente-field input:focus { outline: none; border-color: var(--accent); }
+  .chk-box svg { display: none; }
+  .chk-cell.done .chk-box { background: #16803c; border-color: #16803c; }
+  .chk-cell.done .chk-box svg { display: block; }
 
-  /* PROGRESS BAR */
-  .progress-bar-wrap {
-    margin-bottom: 20px;
+  /* OBSERVACIONES ROW */
+  .tr-obs td {
+    padding: 0;
+    border-right: 1px solid var(--border);
+    border-bottom: 2px solid var(--accent);
+    vertical-align: top;
   }
-
-  .progress-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 6px;
+  .tr-obs td:last-child { border-right: none; }
+  .obs-label {
+    background: #fffbea;
+    font-weight: 700; font-size: 10px; color: #92400e;
+    padding: 6px 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    border-right: 2px solid var(--border) !important;
+    border-bottom: none !important;
   }
+  .obs-textarea {
+    width: 100%; border: none; background: transparent;
+    font-family: var(--font); font-size: 11px; color: var(--text);
+    padding: 5px 6px; resize: none; min-height: 56px;
+    line-height: 1.4; display: block;
+  }
+  .obs-textarea:focus { outline: none; background: #fffdf0; }
 
+  /* PROGRESS ROW */
+  .tr-progress td {
+    padding: 4px 6px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+  }
+  .tr-progress td:last-child { border-right: none; }
   .progress-track {
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
+    height: 5px; background: var(--border); border-radius: 3px; overflow: hidden;
   }
-
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent), #1aad5e);
-    border-radius: 2px;
-    transition: width .3s ease;
+    background: linear-gradient(90deg, var(--accent), #16803c);
+    border-radius: 3px; transition: width .35s ease;
   }
-
-  /* DOMAIN SECTIONS */
-  .domain {
-    margin-bottom: 12px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
+  .progress-lbl {
+    font-size: 9px; color: var(--muted); text-align: center; margin-top: 2px;
   }
-
-  .domain-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    cursor: pointer;
-    user-select: none;
-    transition: background .1s;
+  .td-progress-label {
+    background: #f8fafc; font-size: 10px; font-weight: 600;
+    color: var(--muted); padding: 4px 10px;
+    border-right: 2px solid var(--border) !important;
+    text-transform: uppercase; letter-spacing: 0.4px;
   }
-  .domain-header:hover { background: var(--surface2); }
-
-  .domain-letter {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 13px;
-    flex-shrink: 0;
-  }
-
-  .domain-name {
-    font-weight: 600;
-    font-size: 13px;
-    flex: 1;
-  }
-
-  .domain-count {
-    font-size: 11px;
-    color: var(--muted);
-    font-family: var(--mono);
-  }
-
-  .domain-chevron {
-    color: var(--muted);
-    font-size: 11px;
-    transition: transform .2s;
-  }
-  .domain.collapsed .domain-chevron { transform: rotate(-90deg); }
-
-  .domain-body {
-    border-top: 1px solid var(--border);
-  }
-  .domain.collapsed .domain-body { display: none; }
-
-  /* ITEMS */
-  .item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border);
-    transition: background .1s;
-  }
-  .item:last-child { border-bottom: none; }
-  .item:hover { background: var(--surface2); }
-
-  .item.checked { opacity: 0.6; }
-  .item.checked .item-label { text-decoration: line-through; color: var(--muted); }
-
-  .item-check {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-    accent-color: var(--accent);
-    cursor: pointer;
-    margin-top: 1px;
-  }
-
-  .item-label {
-    font-size: 13px;
-    line-height: 1.4;
-    flex: 1;
-    color: var(--text);
-    transition: color .15s;
-  }
-
-  /* SELECT items */
-  .item-select {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 12px;
-    padding: 4px 8px;
-    margin-top: 4px;
-    width: 100%;
-    max-width: 320px;
-  }
-  .item-select:focus { outline: none; border-color: var(--accent); }
-
-  /* NOTA field */
-  .item-nota {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 12px;
-    padding: 4px 8px;
-    margin-top: 4px;
-    width: 100%;
-    resize: none;
-    height: 36px;
-  }
-  .item-nota:focus { outline: none; border-color: var(--accent); }
 
   /* FOOTER */
   footer {
-    text-align: center;
-    padding: 32px 16px;
-    color: var(--muted);
-    font-size: 11px;
+    text-align: center; padding: 20px 16px;
+    color: var(--muted); font-size: 11px;
     border-top: 1px solid var(--border);
-    margin-top: 40px;
-    line-height: 1.8;
+    background: var(--white); line-height: 2;
+    margin-top: 8px;
   }
-
   footer a { color: var(--accent); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
 
-  @media (max-width: 600px) {
-    header { padding: 12px 14px; }
-    h1 { font-size: 15px; }
-    .main { padding: 16px 10px; }
-    .cama-tabs { padding: 0 10px; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
-  }
+  @media(prefers-reduced-motion: reduce){ * { transition: none !important; } }
 </style>
 </head>
 <body>
 
 <header>
   <div class="header-top">
-    <div class="header-title">
-      <span class="badge-uci">UCI</span>
-      <div>
+    <div class="header-left">
+      <div class="logo-circle">UCI</div>
+      <div class="header-text">
         <h1>«GASTELE UN DIA»</h1>
-        <div class="header-sub">Lista de Chequeo · Ronda Médica · 10 Camas</div>
+        <p>Lista de Chequeo para Ronda Médica UCI · 10 Camas</p>
       </div>
     </div>
-    <div class="header-meta">
-      <div class="meta-field">
-        <span>Fecha:</span>
-        <input type="date" id="fecha-global">
-      </div>
-      <div class="meta-field">
-        <span>Turno:</span>
-        <input type="text" id="turno-global" placeholder="Mañana / Tarde...">
-      </div>
-      <button class="btn-reset" onclick="resetAll()">↺ Reiniciar todo</button>
+    <div class="header-badges">
+      <span class="badge badge-uci">Cuidado Intensivo</span>
+      <span class="badge badge-udc">Universidad de Cartagena</span>
     </div>
+  </div>
+  <div class="meta-bar">
+    <div class="meta-field">
+      <label>Fecha:</label>
+      <input type="date" id="fecha-global">
+    </div>
+    <div class="meta-field">
+      <label>Turno:</label>
+      <input type="text" id="turno-global" placeholder="Mañana / Tarde / Noche" style="width:140px">
+    </div>
+    <div class="meta-field">
+      <label>Médico:</label>
+      <input type="text" id="medico-global" placeholder="Nombre del médico" style="width:160px">
+    </div>
+    <button class="btn-reset" onclick="resetAll()">↺ Reiniciar</button>
   </div>
 </header>
 
-<div class="cama-tabs" id="cama-tabs"></div>
-
-<div class="main" id="main-content"></div>
+<div class="table-wrap">
+  <table id="main-table"></table>
+</div>
 
 <footer>
-  Fonseca-Ruiz NJ, Duque-Pérez JJ, Bello-Muñoz C. <em>Acta Colombiana de Cuidado Intensivo</em> 2024;24:45–54<br>
-  Universidad de Cartagena · UCI<br>
+  Fonseca-Ruiz NJ, Duque-Pérez JJ, Bello-Muñoz C.<br>
+  <em>Acta Colombiana de Cuidado Intensivo</em> 2024;24:45–54 · Universidad de Cartagena · UCI<br>
   <a href="https://diegoocb.github.io/ExPreS/" target="_blank">ExPreS Score Calculator →</a>
 </footer>
 
 <script>
 const DOMINIOS = [
   {
-    id: 'G', letra: 'G', nombre: 'Glucometrías', color: '#1aad5e',
-    items: [
-      { id: 'g1', tipo: 'select', label: '¿Glucemia en meta (110–180 mg/dL)?', opciones: ['Sí','No','No aplica'] },
-      { id: 'g2', tipo: 'check', label: '≥2 glucometrías >180 mg/dL' },
-      { id: 'g3', tipo: 'check', label: 'Hipoglucemia (<70 mg/dL)' },
+    id:'G', letra:'G', nombre:'Glucometrías', color:'#16803c', bg:'#dcfce7',
+    items:[
+      { id:'g1', tipo:'radio', label:'¿Glucemia en meta (110–180 mg/dL)?',
+        opts:['Sí','No','No aplica'], cols:['green','red',''] },
+      { id:'g2', tipo:'check', label:'≥2 glucometrías >180 mg/dL' },
+      { id:'g3', tipo:'check', label:'Hipoglucemia (<70 mg/dL)' },
     ]
   },
   {
-    id: 'A', letra: 'Á', nombre: 'Analgesia', color: '#e8a020',
-    items: [
-      { id: 'a1', tipo: 'select', label: 'Escala EVA/VAS (consciente)', opciones: ['0','1','2','3','4','5','6','7','8','9','10','No aplica'] },
-      { id: 'a2', tipo: 'select', label: 'CPOT (Intubado)', opciones: ['0','1','2','3','4','5','6','7','8','No aplica'] },
-      { id: 'a3', tipo: 'check', label: 'Estrategia multimodal activa (acetaminofén, nefopam, ketamina)' },
+    id:'A0', letra:'Á', nombre:'Analgesia', color:'#b45309', bg:'#fef3c7',
+    items:[
+      { id:'a1', tipo:'radio', label:'Escala EVA/VAS (consciente)',
+        opts:['0–3','4–6','7–10','No aplica'], cols:['green','yellow','red',''] },
+      { id:'a2', tipo:'radio', label:'CPOT (Intubado)',
+        opts:['0–2','3–4','5–8','No aplica'], cols:['green','yellow','red',''] },
+      { id:'a3', tipo:'check', label:'Estrategia multimodal activa' },
     ]
   },
   {
-    id: 'S', letra: 'S', nombre: 'Sedación & Delirium', color: '#c46ef0',
-    items: [
-      { id: 's1', tipo: 'check', label: 'RASS 0 a −2' },
-      { id: 's2', tipo: 'check', label: 'Sedación profunda' },
-      { id: 's3', tipo: 'select', label: 'CAM-ICU aplicado al menos 1 vez/turno', opciones: ['Positivo','Negativo','No aplica'] },
-      { id: 's4', tipo: 'check', label: 'Medidas no farmacológicas activas' },
+    id:'S', letra:'S', nombre:'Sedación & Delirium', color:'#6d28d9', bg:'#ede9fe',
+    items:[
+      { id:'s1', tipo:'radio', label:'RASS 0 a −2',
+        opts:['Sí (meta)','No — profundo','No aplica'], cols:['green','red',''] },
+      { id:'s2', tipo:'check', label:'Sedación profunda — revisar' },
+      { id:'s3', tipo:'radio', label:'CAM-ICU ≥1 vez/turno',
+        opts:['Negativo','Positivo','No aplica'], cols:['green','red',''] },
+      { id:'s4', tipo:'check', label:'Medidas no farmacológicas' },
     ]
   },
   {
-    id: 'T', letra: 'T', nombre: 'Tromboprofilaxis', color: '#3bb8f0',
-    items: [
-      { id: 't1', tipo: 'select', label: '¿Recibiendo profilaxis TEV?', opciones: ['Sí','No','No aplica'] },
-      { id: 't2', tipo: 'check', label: 'Sin riesgo sangrado → HBPM preferida' },
-      { id: 't3', tipo: 'check', label: 'ClCr <30 mL/min → HNF o dalteparina' },
-      { id: 't4', tipo: 'check', label: 'Alto riesgo sangrado → profilaxis mecánica (CNI)' },
+    id:'T', letra:'T', nombre:'Tromboprofilaxis', color:'#0e7490', bg:'#cffafe',
+    items:[
+      { id:'t1', tipo:'radio', label:'¿Recibiendo profilaxis TEV?',
+        opts:['Sí','No — justif.','No — s/justif.'], cols:['green','yellow','red'] },
+      { id:'t2', tipo:'check', label:'Sin riesgo → HBPM preferida' },
+      { id:'t3', tipo:'check', label:'ClCr <30 → HNF / dalteparina' },
+      { id:'t4', tipo:'check', label:'Alto riesgo → mecánica (CNI)' },
     ]
   },
   {
-    id: 'E1', letra: 'E', nombre: 'Elevación cabecera', color: '#f05454',
-    items: [
-      { id: 'e1a', tipo: 'check', label: 'Cabecera >30° continua (verificar físicamente)' },
-      { id: 'e1b', tipo: 'check', label: 'Sin contraindicación documentada' },
+    id:'E1', letra:'E', nombre:'Elevación cabecera', color:'#c0392b', bg:'#fee2e2',
+    items:[
+      { id:'e1a', tipo:'check', label:'Cabecera >30° continua' },
+      { id:'e1b', tipo:'check', label:'Sin contraindicación documentada' },
     ]
   },
   {
-    id: 'L', letra: 'L', nombre: 'Liberación VM', color: '#5dcc8a',
-    items: [
-      { id: 'l1', tipo: 'select', label: '¿Cumple criterios de elegibilidad para PRE?', opciones: ['Sí','No','No aplica'] },
-      { id: 'l2', tipo: 'select', label: 'PRE/SBT programada y coordinada hoy', opciones: ['Sí','No','No aplica'] },
-      { id: 'l3', tipo: 'select', label: 'Tolera PRE → proceder a extubación', opciones: ['Sí','No','No aplica'] },
+    id:'L', letra:'L', nombre:'Liberación VM', color:'#16803c', bg:'#dcfce7',
+    items:[
+      { id:'l1', tipo:'radio', label:'¿Cumple criterios PRE?',
+        opts:['Sí','No','No aplica'], cols:['green','red',''] },
+      { id:'l2', tipo:'radio', label:'PRE/SBT programada hoy',
+        opts:['Sí','No','No aplica'], cols:['green','red',''] },
+      { id:'l3', tipo:'radio', label:'Tolera PRE → extubación',
+        opts:['Sí','No','No aplica'], cols:['green','red',''] },
     ]
   },
   {
-    id: 'E2', letra: 'E', nombre: 'Evacuación intestinal', color: '#f09030',
-    items: [
-      { id: 'e2a', tipo: 'select', label: '¿≥48 h sin deposición?', opciones: ['Sí','No'] },
-      { id: 'e2b', tipo: 'select', label: 'Laxante profiláctico activo', opciones: ['Sí','No','No aplica'] },
-      { id: 'e2c', tipo: 'select', label: '¿Se descartó obstrucción intestinal?', opciones: ['Sí','No','No aplica'] },
+    id:'E2', letra:'E', nombre:'Evacuación intestinal', color:'#c2410c', bg:'#ffedd5',
+    items:[
+      { id:'e2a', tipo:'radio', label:'Deposición en últimas 48 h',
+        opts:['Sí','No — tratar'], cols:['green','red'] },
+      { id:'e2b', tipo:'radio', label:'Laxante profiláctico activo',
+        opts:['Sí','No','No aplica'], cols:['green','red',''] },
+      { id:'e2c', tipo:'radio', label:'¿Descartó obstrucción?',
+        opts:['Sí','Pendiente','No aplica'], cols:['green','yellow',''] },
     ]
   },
   {
-    id: 'U', letra: 'U', nombre: 'Úlceras & Protección gástrica', color: '#f06090',
-    items: [
-      { id: 'u1', tipo: 'select', label: 'Escala de Braden calculada', opciones: ['Alto riesgo (≤12)','Riesgo moderado (13-14)','Bajo riesgo (15-16)','Sin riesgo (17-18)','No aplica'] },
-      { id: 'u2', tipo: 'check', label: 'Rotación postural cada 2 horas' },
-      { id: 'u3', tipo: 'check', label: 'Profilaxis gástrica indicada' },
+    id:'U', letra:'U', nombre:'Úlceras & Prot. gástrica', color:'#be185d', bg:'#fce7f3',
+    items:[
+      { id:'u1', tipo:'radio', label:'Escala de Braden',
+        opts:['≤12','13–14','15–16','17–18','N/A'],
+        cols:['red','yellow','green','green',''] },
+      { id:'u2', tipo:'check', label:'Rotación postural c/2 h' },
+      { id:'u3', tipo:'check', label:'Profilaxis gástrica activa' },
     ]
   },
   {
-    id: 'N', letra: 'N', nombre: 'Nutrición', color: '#a08af0',
-    items: [
-      { id: 'n1', tipo: 'check', label: 'Inicio nutrición dentro de las primeras 48 h del ingreso' },
-      { id: 'n2', tipo: 'check', label: 'Priorizar vía oral siempre que sea posible' },
-      { id: 'n3', tipo: 'check', label: 'Sin VO → NE temprana (SNG/postpilórica)' },
-      { id: 'n4', tipo: 'check', label: 'CI enteral → NPT (no antes del día 7 si bajo riesgo nutricional)' },
-      { id: 'n5', tipo: 'check', label: 'Meta calórica y proteica calculada y en progresión' },
+    id:'N', letra:'N', nombre:'Nutrición', color:'#3730a3', bg:'#e0e7ff',
+    items:[
+      { id:'n1', tipo:'radio', label:'Indicación de VO',
+        opts:['Sí','No aplica'], cols:['green',''] },
+      { id:'n2', tipo:'radio', label:'Indicación de NE',
+        opts:['Sí','No aplica'], cols:['green',''] },
+      { id:'n3', tipo:'radio', label:'Indicación de NPT',
+        opts:['Sí','No aplica'], cols:['yellow',''] },
+      { id:'n4', tipo:'radio', label:'Estado nutricional',
+        opts:['Con nutrición','Sin nutric. justif.','Sin nutric. injustif.'], cols:['green','yellow','red'] },
+    ]
+  },
+  {
+    id:'D', letra:'D', nombre:'Diuresis', color:'#0e7490', bg:'#e0f2fe',
+    items:[
+      { id:'d1', tipo:'radio', label:'Gasto urinario',
+        opts:['>0.5 mL/kg/h','Oliguria','Anuria','N/A'], cols:['green','yellow','red',''] },
+      { id:'d2', tipo:'radio', label:'Perfusión/volemia evaluada',
+        opts:['Sí','Pendiente','No aplica'], cols:['green','red',''] },
+      { id:'d3', tipo:'radio', label:'Tendencia creatinina/BUN',
+        opts:['Estable','En ascenso','No aplica'], cols:['green','red',''] },
+    ]
+  },
+  {
+    id:'I', letra:'I', nombre:'Invasiones', color:'#1a56a0', bg:'#dbeafe',
+    items:[
+      { id:'i1', tipo:'radio', label:'¿Indicación CVC?',
+        opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
+      { id:'i2', tipo:'radio', label:'¿Indicación línea arterial?',
+        opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
+      { id:'i3', tipo:'radio', label:'¿Indicación sonda vesical?',
+        opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
+      { id:'i4', tipo:'radio', label:'¿Indicación SNG/SNO?',
+        opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
+      { id:'i5', tipo:'radio', label:'¿Indicación IOT?',
+        opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
+      { id:'i6', tipo:'check', label:'Inspección sitios inserción' },
+    ]
+  },
+  {
+    id:'AB', letra:'A', nombre:'Antibióticos', color:'#065f46', bg:'#d1fae5',
+    items:[
+      { id:'ab1', tipo:'radio', label:'Uso de antibiótico',
+        opts:['Sí','No','N/A'], cols:['yellow','green',''] },
+      { id:'ab2', tipo:'radio', label:'Foco infeccioso identificado',
+        opts:['Sí','No — buscar','N/A'], cols:['green','red',''] },
+      { id:'ab3', tipo:'radio', label:'Cultivos para ATB dirigida',
+        opts:['Dirigida','Pendiente','Empírico','N/A'], cols:['green','yellow','red',''] },
+      { id:'ab4', tipo:'radio', label:'Ajuste ATB',
+        opts:['Ajustado','Pendiente','N/A'], cols:['green','yellow',''] },
+      { id:'ab5', tipo:'radio', label:'Control del foco',
+        opts:['Logrado','Pendiente','N/A'], cols:['green','yellow',''] },
     ]
   },
 ];
 
 const NUM_CAMAS = 10;
-
-// Estado global
 let state = {};
 
 function initState() {
-  const saved = localStorage.getItem('gastele_state');
-  if (saved) {
-    try { state = JSON.parse(saved); return; } catch(e) {}
-  }
-  state = { fecha: '', turno: '', medico: '', camas: {} };
-  for (let c = 1; c <= NUM_CAMAS; c++) {
-    state.camas[c] = { paciente: '', dx: '', checks: {}, selects: {} };
+  const saved = localStorage.getItem('gastele_v4');
+  if (saved) { try { state = JSON.parse(saved); return; } catch(e){} }
+  state = { fecha:'', turno:'', medico:'', camas:{} };
+  for (let c=1; c<=NUM_CAMAS; c++) {
+    state.camas[c] = { paciente:'', dx:'', obs:'', vals:{} };
   }
 }
 
-function saveState() {
-  localStorage.setItem('gastele_state', JSON.stringify(state));
-}
+function saveState() { localStorage.setItem('gastele_v4', JSON.stringify(state)); }
 
 function resetAll() {
   if (!confirm('¿Reiniciar todos los datos de la ronda? Esta acción no se puede deshacer.')) return;
-  localStorage.removeItem('gastele_state');
+  localStorage.removeItem('gastele_v4');
   location.reload();
 }
 
-function getItemKey(camaId, itemId) { return `${camaId}_${itemId}`; }
+function allItemIds() {
+  return DOMINIOS.flatMap(d => d.items.map(it => it.id));
+}
 
-function getCamaProgress(camaId) {
-  const cam = state.camas[camaId];
-  let total = 0, done = 0;
-  DOMINIOS.forEach(d => {
-    d.items.forEach(it => {
-      total++;
-      if (it.tipo === 'check') {
-        if (cam.checks[it.id]) done++;
-      } else {
-        if (cam.selects[it.id]) done++;
-      }
-    });
+function getCamaProgress(cid) {
+  const vals = state.camas[cid].vals;
+  const ids = allItemIds();
+  return { total: ids.length, done: ids.filter(id => vals[id]).length };
+}
+
+function domainDone(cid, d) {
+  return d.items.filter(it => state.camas[cid].vals[it.id]).length;
+}
+
+function updateProgressBar(cid) {
+  const { total, done } = getCamaProgress(cid);
+  const fill = document.getElementById(`pb-${cid}`);
+  const lbl = document.getElementById(`pb-lbl-${cid}`);
+  if (fill) fill.style.width = Math.round(done/total*100)+'%';
+  if (lbl) lbl.textContent = `${done}/${total}`;
+}
+
+function buildTable() {
+  const table = document.getElementById('main-table');
+  const camas = Array.from({length: NUM_CAMAS}, (_,i) => i+1);
+
+  // ROW 1: headers
+  const trHead = document.createElement('tr');
+  const thLabel = document.createElement('th');
+  thLabel.className = 'th-cama';
+  thLabel.style.cssText = 'background:#0f3d75;min-width:220px;text-align:left;padding-left:12px;';
+  thLabel.textContent = 'Ítem a verificar en ronda';
+  trHead.appendChild(thLabel);
+  camas.forEach(c => {
+    const th = document.createElement('th');
+    th.className = 'th-cama';
+    th.textContent = `Cama ${c}`;
+    trHead.appendChild(th);
   });
-  return { total, done };
-}
+  table.appendChild(trHead);
 
-function updateTabProgress(camaId) {
-  const { total, done } = getCamaProgress(camaId);
-  const tab = document.querySelector(`.cama-tab[data-cama="${camaId}"]`);
-  if (!tab) return;
-  tab.classList.remove('has-progress', 'complete');
-  if (done === total) tab.classList.add('complete');
-  else if (done > 0) tab.classList.add('has-progress');
-}
-
-function updateProgressBar(camaId) {
-  const { total, done } = getCamaProgress(camaId);
-  const fill = document.getElementById(`pb-fill-${camaId}`);
-  const info = document.getElementById(`pb-info-${camaId}`);
-  if (!fill || !info) return;
-  const pct = Math.round((done / total) * 100);
-  fill.style.width = pct + '%';
-  info.textContent = `${done} / ${total} ítems completados`;
-}
-
-function renderTabs() {
-  const container = document.getElementById('cama-tabs');
-  for (let c = 1; c <= NUM_CAMAS; c++) {
-    const tab = document.createElement('div');
-    tab.className = 'cama-tab';
-    tab.dataset.cama = c;
-    tab.innerHTML = `Cama ${c}<span class="progress-dot"></span>`;
-    tab.addEventListener('click', () => switchCama(c));
-    container.appendChild(tab);
-  }
-}
-
-function switchCama(camaId) {
-  document.querySelectorAll('.cama-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.cama-panel').forEach(p => p.classList.remove('active'));
-  document.querySelector(`.cama-tab[data-cama="${camaId}"]`).classList.add('active');
-  document.getElementById(`panel-${camaId}`).classList.add('active');
-}
-
-function renderPanels() {
-  const container = document.getElementById('main-content');
-  for (let c = 1; c <= NUM_CAMAS; c++) {
-    const panel = document.createElement('div');
-    panel.className = 'cama-panel';
-    panel.id = `panel-${c}`;
-    panel.innerHTML = buildPanel(c);
-    container.appendChild(panel);
-    bindPanelEvents(panel, c);
-  }
-}
-
-function buildPanel(c) {
-  const cam = state.camas[c];
-  let html = `
-    <div class="paciente-card">
-      <div class="paciente-field">
-        <label>Paciente</label>
-        <input type="text" class="pac-nombre" placeholder="Nombre del paciente" value="${cam.paciente || ''}">
-      </div>
-      <div class="paciente-field">
-        <label>Diagnóstico principal</label>
-        <input type="text" class="pac-dx" placeholder="Diagnóstico" value="${cam.dx || ''}">
-      </div>
-    </div>
-
-    <div class="progress-bar-wrap">
-      <div class="progress-info">
-        <span>Progreso de ronda</span>
-        <span id="pb-info-${c}">0 / 0 ítems completados</span>
-      </div>
-      <div class="progress-track"><div class="progress-fill" id="pb-fill-${c}" style="width:0%"></div></div>
-    </div>
-  `;
-
-  DOMINIOS.forEach(d => {
-    const { total, done } = domainProgress(c, d);
-    html += `
-      <div class="domain" id="dom-${c}-${d.id}">
-        <div class="domain-header" onclick="toggleDomain('${c}','${d.id}')">
-          <div class="domain-letter" style="background:${d.color}22;color:${d.color}">${d.letra}</div>
-          <span class="domain-name">${d.nombre}</span>
-          <span class="domain-count">${done}/${total}</span>
-          <span class="domain-chevron">▾</span>
-        </div>
-        <div class="domain-body">
-          ${d.items.map(it => buildItem(c, it, cam)).join('')}
-        </div>
-      </div>
+  // ROW 2: paciente
+  const trPac = document.createElement('tr');
+  trPac.className = 'tr-pac';
+  const tdPacLabel = document.createElement('td');
+  tdPacLabel.className = 'td-label-pac';
+  tdPacLabel.style.cssText = 'padding:8px 10px;';
+  tdPacLabel.innerHTML = '🛏 Paciente / Diagnóstico';
+  trPac.appendChild(tdPacLabel);
+  camas.forEach(c => {
+    const td = document.createElement('td');
+    td.className = 'pac-cell';
+    td.innerHTML = `
+      <input class="pac-input" placeholder="Paciente..." data-cama="${c}" data-field="paciente" value="${state.camas[c].paciente||''}">
+      <input class="pac-input" placeholder="Diagnóstico..." data-cama="${c}" data-field="dx" value="${state.camas[c].dx||''}" style="border-top:1px solid var(--border);margin-top:2px;">
     `;
+    trPac.appendChild(td);
   });
+  table.appendChild(trPac);
 
-  return html;
-}
-
-function domainProgress(camaId, dominio) {
-  const cam = state.camas[camaId];
-  let total = dominio.items.length, done = 0;
-  dominio.items.forEach(it => {
-    if (it.tipo === 'check' && cam.checks[it.id]) done++;
-    if (it.tipo === 'select' && cam.selects[it.id]) done++;
+  // ROW 3: progress
+  const trProg = document.createElement('tr');
+  trProg.className = 'tr-progress';
+  const tdProgLabel = document.createElement('td');
+  tdProgLabel.className = 'td-progress-label';
+  tdProgLabel.textContent = 'Progreso de ronda';
+  trProg.appendChild(tdProgLabel);
+  camas.forEach(c => {
+    const { total, done } = getCamaProgress(c);
+    const pct = Math.round(done/total*100);
+    const td = document.createElement('td');
+    td.innerHTML = `
+      <div class="progress-track"><div class="progress-fill" id="pb-${c}" style="width:${pct}%"></div></div>
+      <div class="progress-lbl" id="pb-lbl-${c}">${done}/${total}</div>
+    `;
+    trProg.appendChild(td);
   });
-  return { total, done };
-}
+  table.appendChild(trProg);
 
-function buildItem(c, it, cam) {
-  if (it.tipo === 'check') {
-    const checked = cam.checks[it.id] ? 'checked' : '';
-    const cls = cam.checks[it.id] ? 'item checked' : 'item';
-    return `
-      <div class="${cls}" id="item-${c}-${it.id}">
-        <input type="checkbox" class="item-check" data-cama="${c}" data-item="${it.id}" ${checked}>
-        <span class="item-label">${it.label}</span>
-      </div>`;
-  } else {
-    const val = cam.selects[it.id] || '';
-    const opts = it.opciones.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('');
-    return `
-      <div class="item" id="item-${c}-${it.id}">
-        <div style="flex:1">
-          <div class="item-label">${it.label}</div>
-          <select class="item-select" data-cama="${c}" data-item="${it.id}">
-            <option value="">— Seleccionar —</option>
-            ${opts}
-          </select>
-        </div>
-      </div>`;
-  }
-}
+  // DOMAINS + ITEMS
+  DOMINIOS.forEach(d => {
+    // Domain header row
+    const trDom = document.createElement('tr');
+    trDom.className = 'tr-domain';
+    trDom.style.background = d.bg;
+    const tdDomLabel = document.createElement('td');
+    tdDomLabel.className = 'td-domain-label';
+    tdDomLabel.style.cssText = `background:${d.bg};color:${d.color};border-right:2px solid ${d.color}40;`;
+    tdDomLabel.innerHTML = `<span class="domain-pill-sm" style="background:${d.color}22;color:${d.color}">${d.letra}</span>${d.nombre}`;
+    trDom.appendChild(tdDomLabel);
+    camas.forEach(() => {
+      const td = document.createElement('td');
+      td.style.background = d.bg;
+      trDom.appendChild(td);
+    });
+    table.appendChild(trDom);
 
-function bindPanelEvents(panel, c) {
-  // Paciente fields
-  panel.querySelector('.pac-nombre').addEventListener('input', e => {
-    state.camas[c].paciente = e.target.value;
-    saveState();
-  });
-  panel.querySelector('.pac-dx').addEventListener('input', e => {
-    state.camas[c].dx = e.target.value;
-    saveState();
-  });
+    // Item rows
+    d.items.forEach(it => {
+      const trItem = document.createElement('tr');
+      trItem.className = 'tr-item';
 
-  // Checkboxes
-  panel.querySelectorAll('.item-check').forEach(cb => {
-    cb.addEventListener('change', e => {
-      const itemId = e.target.dataset.item;
-      const camaId = parseInt(e.target.dataset.cama);
-      state.camas[camaId].checks[itemId] = e.target.checked;
-      const row = document.getElementById(`item-${camaId}-${itemId}`);
-      if (row) row.className = e.target.checked ? 'item checked' : 'item';
-      saveState();
-      refreshDomainCount(camaId, itemId);
-      updateProgressBar(camaId);
-      updateTabProgress(camaId);
+      // Label
+      const tdLbl = document.createElement('td');
+      tdLbl.className = 'td-label';
+      tdLbl.innerHTML = `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${d.color};margin-right:5px;vertical-align:middle;flex-shrink:0"></span>${it.label}`;
+      trItem.appendChild(tdLbl);
+
+      // Cells per cama
+      camas.forEach(c => {
+        const td = document.createElement('td');
+        td.className = 'td-cell';
+        const val = state.camas[c].vals[it.id]||'';
+
+        if (it.tipo === 'radio') {
+          const grp = document.createElement('div');
+          grp.className = 'radio-group-col';
+          it.opts.forEach((op, i) => {
+            const cc = (it.cols&&it.cols[i])||'';
+            const uid = `r_${c}_${it.id}_${i}`;
+            const pill = document.createElement('span');
+            pill.className = `rpill ${cc}`;
+            pill.innerHTML = `
+              <input type="radio" name="r_${c}_${it.id}" id="${uid}" value="${op}" ${val===op?'checked':''} data-cama="${c}" data-item="${it.id}">
+              <label for="${uid}" title="${op}">${op}</label>
+            `;
+            grp.appendChild(pill);
+          });
+          td.appendChild(grp);
+        } else {
+          const done = val === 'yes';
+          const div = document.createElement('div');
+          div.className = `chk-cell${done?' done':''}`;
+          div.id = `cr-${c}-${it.id}`;
+          div.dataset.cama = c;
+          div.dataset.item = it.id;
+          div.innerHTML = `<div class="chk-box">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+              <path d="M1.5 5.5l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>`;
+          div.onclick = () => toggleCheck(parseInt(div.dataset.cama), div.dataset.item);
+          td.appendChild(div);
+        }
+
+        trItem.appendChild(td);
+      });
+      table.appendChild(trItem);
     });
   });
 
-  // Selects
-  panel.querySelectorAll('.item-select').forEach(sel => {
-    sel.addEventListener('change', e => {
-      const itemId = e.target.dataset.item;
-      const camaId = parseInt(e.target.dataset.cama);
-      state.camas[camaId].selects[itemId] = e.target.value;
+  // OBSERVACIONES ROW
+  const trObs = document.createElement('tr');
+  trObs.className = 'tr-obs';
+  const tdObsLabel = document.createElement('td');
+  tdObsLabel.className = 'obs-label';
+  tdObsLabel.textContent = '📋 Observaciones / Plan del día';
+  trObs.appendChild(tdObsLabel);
+  camas.forEach(c => {
+    const td = document.createElement('td');
+    td.style.padding = '0';
+    const ta = document.createElement('textarea');
+    ta.className = 'obs-textarea';
+    ta.placeholder = 'Anotaciones...';
+    ta.dataset.cama = c;
+    ta.value = state.camas[c].obs||'';
+    ta.addEventListener('input', e => {
+      state.camas[parseInt(e.target.dataset.cama)].obs = e.target.value;
       saveState();
-      refreshDomainCount(camaId, itemId);
-      updateProgressBar(camaId);
-      updateTabProgress(camaId);
+    });
+    td.appendChild(ta);
+    trObs.appendChild(td);
+  });
+  table.appendChild(trObs);
+
+  // Bind events
+  bindEvents();
+}
+
+function bindEvents() {
+  // Paciente inputs
+  document.querySelectorAll('.pac-input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const cid = parseInt(e.target.dataset.cama);
+      const field = e.target.dataset.field;
+      state.camas[cid][field] = e.target.value;
+      saveState();
+    });
+  });
+
+  // Radio buttons
+  document.querySelectorAll('input[type="radio"]').forEach(r => {
+    r.addEventListener('change', e => {
+      const cid = parseInt(e.target.dataset.cama);
+      const iid = e.target.dataset.item;
+      state.camas[cid].vals[iid] = e.target.value;
+      saveState();
+      updateProgressBar(cid);
     });
   });
 }
 
-function refreshDomainCount(camaId, itemId) {
-  const dominio = DOMINIOS.find(d => d.items.some(it => it.id === itemId));
-  if (!dominio) return;
-  const { total, done } = domainProgress(camaId, dominio);
-  const countEl = document.querySelector(`#dom-${camaId}-${dominio.id} .domain-count`);
-  if (countEl) countEl.textContent = `${done}/${total}`;
+function toggleCheck(cid, iid) {
+  const cur = state.camas[cid].vals[iid];
+  state.camas[cid].vals[iid] = cur==='yes' ? '' : 'yes';
+  saveState();
+  const el = document.getElementById(`cr-${cid}-${iid}`);
+  if (el) el.className = 'chk-cell'+(state.camas[cid].vals[iid]==='yes'?' done':'');
+  updateProgressBar(cid);
 }
 
-function toggleDomain(camaId, domId) {
-  const el = document.getElementById(`dom-${camaId}-${domId}`);
-  if (el) el.classList.toggle('collapsed');
-}
-
-function initGlobalFields() {
-  const fechaInput = document.getElementById('fecha-global');
-  const turnoInput = document.getElementById('turno-global');
-
-  // Set today's date as default
-  if (!state.fecha) {
-    const today = new Date().toISOString().split('T')[0];
-    state.fecha = today;
-    saveState();
-  }
-  fechaInput.value = state.fecha;
-  turnoInput.value = state.turno || '';
-
-  fechaInput.addEventListener('change', e => { state.fecha = e.target.value; saveState(); });
-  turnoInput.addEventListener('input', e => { state.turno = e.target.value; saveState(); });
+function initGlobal() {
+  const fi = document.getElementById('fecha-global');
+  const ti = document.getElementById('turno-global');
+  const mi = document.getElementById('medico-global');
+  if (!state.fecha) { state.fecha = new Date().toISOString().split('T')[0]; saveState(); }
+  fi.value = state.fecha; ti.value = state.turno||''; mi.value = state.medico||'';
+  fi.addEventListener('change', e=>{ state.fecha=e.target.value; saveState(); });
+  ti.addEventListener('input', e=>{ state.turno=e.target.value; saveState(); });
+  mi.addEventListener('input', e=>{ state.medico=e.target.value; saveState(); });
 }
 
 function init() {
   initState();
-  renderTabs();
-  renderPanels();
-  initGlobalFields();
-
-  // Set all progress bars
-  for (let c = 1; c <= NUM_CAMAS; c++) {
-    updateProgressBar(c);
-    updateTabProgress(c);
-  }
-
-  // Activate first tab
-  switchCama(1);
+  buildTable();
+  initGlobal();
 }
 
 init();
