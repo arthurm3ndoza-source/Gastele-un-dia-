@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GASTELE UN DIA · Lista de Chequeo UCI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2230;
+    --border: #2a3444;
+    --text: #e6edf3;
+    --muted: #7d8fa3;
+    --accent: #1e8aff;
+    --accent-soft: rgba(30,138,255,0.12);
+
+    --g: #1aad5e;   /* Glucometrias */
+    --a: #e8a020;   /* Analgesia */
+    --s: #c46ef0;   /* Sedacion */
+    --t: #3bb8f0;   /* Tromboprofilaxis */
+    --e1: #f05454;  /* Elevacion cabecera */
+    --l: #5dcc8a;   /* Liberacion VM */
+    --e2: #f09030;  /* Evacuacion intestinal */
+    --u: #f06090;   /* Ulceras */
+    --n: #a08af0;   /* Nutricion */
+
+    --radius: 8px;
+    --font: 'Inter', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .badge-uci {
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .header-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-family: var(--mono);
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .meta-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .meta-field input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 8px;
+    width: 120px;
+  }
+
+  .meta-field input:focus { outline: none; border-color: var(--accent); }
+
+  .btn-reset {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--font);
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-reset:hover { border-color: #f05454; color: #f05454; }
+
+  /* TABS — CAMAS */
+  .cama-tabs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .cama-tabs::-webkit-scrollbar { display: none; }
+
+  .cama-tab {
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all .15s;
+    position: relative;
+    user-select: none;
+  }
+
+  .cama-tab:hover { color: var(--text); }
+
+  .cama-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .cama-tab .progress-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    margin-left: 6px;
+    vertical-align: middle;
+    transition: background .2s;
+  }
+
+  .cama-tab.has-progress .progress-dot { background: var(--g); }
+  .cama-tab.complete .progress-dot { background: #1aad5e; }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  .cama-panel { display: none; }
+  .cama-panel.active { display: block; }
+
+  /* PACIENTE CARD */
+  .paciente-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .paciente-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .paciente-field label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .paciente-field input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 6px 10px;
+    width: 100%;
+  }
+  .paciente-field input:focus { outline: none; border-color: var(--accent); }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap {
+    margin-bottom: 20px;
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .progress-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #1aad5e);
+    border-radius: 2px;
+    transition: width .3s ease;
+  }
+
+  /* DOMAIN SECTIONS */
+  .domain {
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .domain-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .1s;
+  }
+  .domain-header:hover { background: var(--surface2); }
+
+  .domain-letter {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .domain-name {
+    font-weight: 600;
+    font-size: 13px;
+    flex: 1;
+  }
+
+  .domain-count {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .domain-chevron {
+    color: var(--muted);
+    font-size: 11px;
+    transition: transform .2s;
+  }
+  .domain.collapsed .domain-chevron { transform: rotate(-90deg); }
+
+  .domain-body {
+    border-top: 1px solid var(--border);
+  }
+  .domain.collapsed .domain-body { display: none; }
+
+  /* ITEMS */
+  .item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background .1s;
+  }
+  .item:last-child { border-bottom: none; }
+  .item:hover { background: var(--surface2); }
+
+  .item.checked { opacity: 0.6; }
+  .item.checked .item-label { text-decoration: line-through; color: var(--muted); }
+
+  .item-check {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+    margin-top: 1px;
+  }
+
+  .item-label {
+    font-size: 13px;
+    line-height: 1.4;
+    flex: 1;
+    color: var(--text);
+    transition: color .15s;
+  }
+
+  /* SELECT items */
+  .item-select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 12px;
+    padding: 4px 8px;
+    margin-top: 4px;
+    width: 100%;
+    max-width: 320px;
+  }
+  .item-select:focus { outline: none; border-color: var(--accent); }
+
+  /* NOTA field */
+  .item-nota {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 12px;
+    padding: 4px 8px;
+    margin-top: 4px;
+    width: 100%;
+    resize: none;
+    height: 36px;
+  }
+  .item-nota:focus { outline: none; border-color: var(--accent); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--muted);
+    font-size: 11px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+    line-height: 1.8;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    header { padding: 12px 14px; }
+    h1 { font-size: 15px; }
+    .main { padding: 16px 10px; }
+    .cama-tabs { padding: 0 10px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-title">
+      <span class="badge-uci">UCI</span>
+      <div>
+        <h1>«GASTELE UN DIA»</h1>
+        <div class="header-sub">Lista de Chequeo · Ronda Médica · 10 Camas</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-field">
+        <span>Fecha:</span>
+        <input type="date" id="fecha-global">
+      </div>
+      <div class="meta-field">
+        <span>Turno:</span>
+        <input type="text" id="turno-global" placeholder="Mañana / Tarde...">
+      </div>
+      <button class="btn-reset" onclick="resetAll()">↺ Reiniciar todo</button>
+    </div>
+  </div>
+</header>
+
+<div class="cama-tabs" id="cama-tabs"></div>
+
+<div class="main" id="main-content"></div>
+
+<footer>
+  Fonseca-Ruiz NJ, Duque-Pérez JJ, Bello-Muñoz C. <em>Acta Colombiana de Cuidado Intensivo</em> 2024;24:45–54<br>
+  Universidad de Cartagena · UCI<br>
+  <a href="https://diegoocb.github.io/ExPreS/" target="_blank">ExPreS Score Calculator →</a>
+</footer>
+
+<script>
+const DOMINIOS = [
+  {
+    id: 'G', letra: 'G', nombre: 'Glucometrías', color: '#1aad5e',
+    items: [
+      { id: 'g1', tipo: 'select', label: '¿Glucemia en meta (110–180 mg/dL)?', opciones: ['Sí','No','No aplica'] },
+      { id: 'g2', tipo: 'check', label: '≥2 glucometrías >180 mg/dL' },
+      { id: 'g3', tipo: 'check', label: 'Hipoglucemia (<70 mg/dL)' },
+    ]
+  },
+  {
+    id: 'A', letra: 'Á', nombre: 'Analgesia', color: '#e8a020',
+    items: [
+      { id: 'a1', tipo: 'select', label: 'Escala EVA/VAS (consciente)', opciones: ['0','1','2','3','4','5','6','7','8','9','10','No aplica'] },
+      { id: 'a2', tipo: 'select', label: 'CPOT (Intubado)', opciones: ['0','1','2','3','4','5','6','7','8','No aplica'] },
+      { id: 'a3', tipo: 'check', label: 'Estrategia multimodal activa (acetaminofén, nefopam, ketamina)' },
+    ]
+  },
+  {
+    id: 'S', letra: 'S', nombre: 'Sedación & Delirium', color: '#c46ef0',
+    items: [
+      { id: 's1', tipo: 'check', label: 'RASS 0 a −2' },
+      { id: 's2', tipo: 'check', label: 'Sedación profunda' },
+      { id: 's3', tipo: 'select', label: 'CAM-ICU aplicado al menos 1 vez/turno', opciones: ['Positivo','Negativo','No aplica'] },
+      { id: 's4', tipo: 'check', label: 'Medidas no farmacológicas activas' },
+    ]
+  },
+  {
+    id: 'T', letra: 'T', nombre: 'Tromboprofilaxis', color: '#3bb8f0',
+    items: [
+      { id: 't1', tipo: 'select', label: '¿Recibiendo profilaxis TEV?', opciones: ['Sí','No','No aplica'] },
+      { id: 't2', tipo: 'check', label: 'Sin riesgo sangrado → HBPM preferida' },
+      { id: 't3', tipo: 'check', label: 'ClCr <30 mL/min → HNF o dalteparina' },
+      { id: 't4', tipo: 'check', label: 'Alto riesgo sangrado → profilaxis mecánica (CNI)' },
+    ]
+  },
+  {
+    id: 'E1', letra: 'E', nombre: 'Elevación cabecera', color: '#f05454',
+    items: [
+      { id: 'e1a', tipo: 'check', label: 'Cabecera >30° continua (verificar físicamente)' },
+      { id: 'e1b', tipo: 'check', label: 'Sin contraindicación documentada' },
+    ]
+  },
+  {
+    id: 'L', letra: 'L', nombre: 'Liberación VM', color: '#5dcc8a',
+    items: [
+      { id: 'l1', tipo: 'select', label: '¿Cumple criterios de elegibilidad para PRE?', opciones: ['Sí','No','No aplica'] },
+      { id: 'l2', tipo: 'select', label: 'PRE/SBT programada y coordinada hoy', opciones: ['Sí','No','No aplica'] },
+      { id: 'l3', tipo: 'select', label: 'Tolera PRE → proceder a extubación', opciones: ['Sí','No','No aplica'] },
+    ]
+  },
+  {
+    id: 'E2', letra: 'E', nombre: 'Evacuación intestinal', color: '#f09030',
+    items: [
+      { id: 'e2a', tipo: 'select', label: '¿≥48 h sin deposición?', opciones: ['Sí','No'] },
+      { id: 'e2b', tipo: 'select', label: 'Laxante profiláctico activo', opciones: ['Sí','No','No aplica'] },
+      { id: 'e2c', tipo: 'select', label: '¿Se descartó obstrucción intestinal?', opciones: ['Sí','No','No aplica'] },
+    ]
+  },
+  {
+    id: 'U', letra: 'U', nombre: 'Úlceras & Protección gástrica', color: '#f06090',
+    items: [
+      { id: 'u1', tipo: 'select', label: 'Escala de Braden calculada', opciones: ['Alto riesgo (≤12)','Riesgo moderado (13-14)','Bajo riesgo (15-16)','Sin riesgo (17-18)','No aplica'] },
+      { id: 'u2', tipo: 'check', label: 'Rotación postural cada 2 horas' },
+      { id: 'u3', tipo: 'check', label: 'Profilaxis gástrica indicada' },
+    ]
+  },
+  {
+    id: 'N', letra: 'N', nombre: 'Nutrición', color: '#a08af0',
+    items: [
+      { id: 'n1', tipo: 'check', label: 'Inicio nutrición dentro de las primeras 48 h del ingreso' },
+      { id: 'n2', tipo: 'check', label: 'Priorizar vía oral siempre que sea posible' },
+      { id: 'n3', tipo: 'check', label: 'Sin VO → NE temprana (SNG/postpilórica)' },
+      { id: 'n4', tipo: 'check', label: 'CI enteral → NPT (no antes del día 7 si bajo riesgo nutricional)' },
+      { id: 'n5', tipo: 'check', label: 'Meta calórica y proteica calculada y en progresión' },
+    ]
+  },
+];
+
+const NUM_CAMAS = 10;
+
+// Estado global
+let state = {};
+
+function initState() {
+  const saved = localStorage.getItem('gastele_state');
+  if (saved) {
+    try { state = JSON.parse(saved); return; } catch(e) {}
+  }
+  state = { fecha: '', turno: '', medico: '', camas: {} };
+  for (let c = 1; c <= NUM_CAMAS; c++) {
+    state.camas[c] = { paciente: '', dx: '', checks: {}, selects: {} };
+  }
+}
+
+function saveState() {
+  localStorage.setItem('gastele_state', JSON.stringify(state));
+}
+
+function resetAll() {
+  if (!confirm('¿Reiniciar todos los datos de la ronda? Esta acción no se puede deshacer.')) return;
+  localStorage.removeItem('gastele_state');
+  location.reload();
+}
+
+function getItemKey(camaId, itemId) { return `${camaId}_${itemId}`; }
+
+function getCamaProgress(camaId) {
+  const cam = state.camas[camaId];
+  let total = 0, done = 0;
+  DOMINIOS.forEach(d => {
+    d.items.forEach(it => {
+      total++;
+      if (it.tipo === 'check') {
+        if (cam.checks[it.id]) done++;
+      } else {
+        if (cam.selects[it.id]) done++;
+      }
+    });
+  });
+  return { total, done };
+}
+
+function updateTabProgress(camaId) {
+  const { total, done } = getCamaProgress(camaId);
+  const tab = document.querySelector(`.cama-tab[data-cama="${camaId}"]`);
+  if (!tab) return;
+  tab.classList.remove('has-progress', 'complete');
+  if (done === total) tab.classList.add('complete');
+  else if (done > 0) tab.classList.add('has-progress');
+}
+
+function updateProgressBar(camaId) {
+  const { total, done } = getCamaProgress(camaId);
+  const fill = document.getElementById(`pb-fill-${camaId}`);
+  const info = document.getElementById(`pb-info-${camaId}`);
+  if (!fill || !info) return;
+  const pct = Math.round((done / total) * 100);
+  fill.style.width = pct + '%';
+  info.textContent = `${done} / ${total} ítems completados`;
+}
+
+function renderTabs() {
+  const container = document.getElementById('cama-tabs');
+  for (let c = 1; c <= NUM_CAMAS; c++) {
+    const tab = document.createElement('div');
+    tab.className = 'cama-tab';
+    tab.dataset.cama = c;
+    tab.innerHTML = `Cama ${c}<span class="progress-dot"></span>`;
+    tab.addEventListener('click', () => switchCama(c));
+    container.appendChild(tab);
+  }
+}
+
+function switchCama(camaId) {
+  document.querySelectorAll('.cama-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.cama-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.cama-tab[data-cama="${camaId}"]`).classList.add('active');
+  document.getElementById(`panel-${camaId}`).classList.add('active');
+}
+
+function renderPanels() {
+  const container = document.getElementById('main-content');
+  for (let c = 1; c <= NUM_CAMAS; c++) {
+    const panel = document.createElement('div');
+    panel.className = 'cama-panel';
+    panel.id = `panel-${c}`;
+    panel.innerHTML = buildPanel(c);
+    container.appendChild(panel);
+    bindPanelEvents(panel, c);
+  }
+}
+
+function buildPanel(c) {
+  const cam = state.camas[c];
+  let html = `
+    <div class="paciente-card">
+      <div class="paciente-field">
+        <label>Paciente</label>
+        <input type="text" class="pac-nombre" placeholder="Nombre del paciente" value="${cam.paciente || ''}">
+      </div>
+      <div class="paciente-field">
+        <label>Diagnóstico principal</label>
+        <input type="text" class="pac-dx" placeholder="Diagnóstico" value="${cam.dx || ''}">
+      </div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-info">
+        <span>Progreso de ronda</span>
+        <span id="pb-info-${c}">0 / 0 ítems completados</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="pb-fill-${c}" style="width:0%"></div></div>
+    </div>
+  `;
+
+  DOMINIOS.forEach(d => {
+    const { total, done } = domainProgress(c, d);
+    html += `
+      <div class="domain" id="dom-${c}-${d.id}">
+        <div class="domain-header" onclick="toggleDomain('${c}','${d.id}')">
+          <div class="domain-letter" style="background:${d.color}22;color:${d.color}">${d.letra}</div>
+          <span class="domain-name">${d.nombre}</span>
+          <span class="domain-count">${done}/${total}</span>
+          <span class="domain-chevron">▾</span>
+        </div>
+        <div class="domain-body">
+          ${d.items.map(it => buildItem(c, it, cam)).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  return html;
+}
+
+function domainProgress(camaId, dominio) {
+  const cam = state.camas[camaId];
+  let total = dominio.items.length, done = 0;
+  dominio.items.forEach(it => {
+    if (it.tipo === 'check' && cam.checks[it.id]) done++;
+    if (it.tipo === 'select' && cam.selects[it.id]) done++;
+  });
+  return { total, done };
+}
+
+function buildItem(c, it, cam) {
+  if (it.tipo === 'check') {
+    const checked = cam.checks[it.id] ? 'checked' : '';
+    const cls = cam.checks[it.id] ? 'item checked' : 'item';
+    return `
+      <div class="${cls}" id="item-${c}-${it.id}">
+        <input type="checkbox" class="item-check" data-cama="${c}" data-item="${it.id}" ${checked}>
+        <span class="item-label">${it.label}</span>
+      </div>`;
+  } else {
+    const val = cam.selects[it.id] || '';
+    const opts = it.opciones.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('');
+    return `
+      <div class="item" id="item-${c}-${it.id}">
+        <div style="flex:1">
+          <div class="item-label">${it.label}</div>
+          <select class="item-select" data-cama="${c}" data-item="${it.id}">
+            <option value="">— Seleccionar —</option>
+            ${opts}
+          </select>
+        </div>
+      </div>`;
+  }
+}
+
+function bindPanelEvents(panel, c) {
+  // Paciente fields
+  panel.querySelector('.pac-nombre').addEventListener('input', e => {
+    state.camas[c].paciente = e.target.value;
+    saveState();
+  });
+  panel.querySelector('.pac-dx').addEventListener('input', e => {
+    state.camas[c].dx = e.target.value;
+    saveState();
+  });
+
+  // Checkboxes
+  panel.querySelectorAll('.item-check').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const itemId = e.target.dataset.item;
+      const camaId = parseInt(e.target.dataset.cama);
+      state.camas[camaId].checks[itemId] = e.target.checked;
+      const row = document.getElementById(`item-${camaId}-${itemId}`);
+      if (row) row.className = e.target.checked ? 'item checked' : 'item';
+      saveState();
+      refreshDomainCount(camaId, itemId);
+      updateProgressBar(camaId);
+      updateTabProgress(camaId);
+    });
+  });
+
+  // Selects
+  panel.querySelectorAll('.item-select').forEach(sel => {
+    sel.addEventListener('change', e => {
+      const itemId = e.target.dataset.item;
+      const camaId = parseInt(e.target.dataset.cama);
+      state.camas[camaId].selects[itemId] = e.target.value;
+      saveState();
+      refreshDomainCount(camaId, itemId);
+      updateProgressBar(camaId);
+      updateTabProgress(camaId);
+    });
+  });
+}
+
+function refreshDomainCount(camaId, itemId) {
+  const dominio = DOMINIOS.find(d => d.items.some(it => it.id === itemId));
+  if (!dominio) return;
+  const { total, done } = domainProgress(camaId, dominio);
+  const countEl = document.querySelector(`#dom-${camaId}-${dominio.id} .domain-count`);
+  if (countEl) countEl.textContent = `${done}/${total}`;
+}
+
+function toggleDomain(camaId, domId) {
+  const el = document.getElementById(`dom-${camaId}-${domId}`);
+  if (el) el.classList.toggle('collapsed');
+}
+
+function initGlobalFields() {
+  const fechaInput = document.getElementById('fecha-global');
+  const turnoInput = document.getElementById('turno-global');
+
+  // Set today's date as default
+  if (!state.fecha) {
+    const today = new Date().toISOString().split('T')[0];
+    state.fecha = today;
+    saveState();
+  }
+  fechaInput.value = state.fecha;
+  turnoInput.value = state.turno || '';
+
+  fechaInput.addEventListener('change', e => { state.fecha = e.target.value; saveState(); });
+  turnoInput.addEventListener('input', e => { state.turno = e.target.value; saveState(); });
+}
+
+function init() {
+  initState();
+  renderTabs();
+  renderPanels();
+  initGlobalFields();
+
+  // Set all progress bars
+  for (let c = 1; c <= NUM_CAMAS; c++) {
+    updateProgressBar(c);
+    updateTabProgress(c);
+  }
+
+  // Activate first tab
+  switchCama(1);
+}
+
+init();
+</script>
+</body>
+</html>
