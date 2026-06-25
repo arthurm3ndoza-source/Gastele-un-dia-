@@ -17,6 +17,7 @@
     --accent-light: #e8f0fb;
     --font: 'Inter', sans-serif;
     --shadow: 0 1px 4px rgba(0,0,0,0.07);
+    --header-h: 90px; /* approximate sticky header height */
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,7 +27,7 @@
   header {
     background: var(--white);
     border-bottom: 3px solid var(--accent);
-    position: sticky; top: 0; z-index: 200;
+    position: sticky; top: 0; z-index: 300;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
   .header-top {
@@ -69,75 +70,110 @@
 
   /* TABLE WRAPPER */
   .table-wrap {
-    overflow-x: auto;
-    padding: 16px 12px;
+    overflow: auto;
+    padding: 0 0 16px 0; /* no top/side padding — table sits flush */
+    max-height: calc(100vh - 95px);
+    background: var(--bg);
   }
 
   /* MAIN TABLE */
   table {
-    border-collapse: separate;
-    border-spacing: 0;
-    min-width: 1200px;
-    width: 100%;
+    border-collapse: separate; border-spacing: 0;
+    min-width: 1200px; width: 100%;
     background: var(--white);
     border-radius: 12px;
     box-shadow: var(--shadow);
-    overflow: hidden;
   }
 
-  /* COLUMN HEADERS — row 1: cama numbers */
-  .th-cama {
+  /* All regular cells get z-index 1 so sticky rows always paint above them */
+  table td, table th { position: relative; z-index: 1; }
+
+  /* Row 1: Cama 1-10 — sticks at top:0 */
+  .row-cama-header th {
+    position: sticky;
+    top: 0;
+    z-index: 100;
     background: var(--accent);
     color: #fff;
-    font-weight: 700;
-    font-size: 12px;
+    font-weight: 700; font-size: 12px;
     text-align: center;
     padding: 8px 4px;
     border-right: 1px solid rgba(255,255,255,0.15);
     white-space: nowrap;
     min-width: 88px;
+    box-shadow: 0 4px 0 0 var(--accent); /* seals the gap below */
   }
-  .th-cama:last-child { border-right: none; }
+  .row-cama-header th:first-child {
+    background: #0f3d75;
+    text-align: left;
+    padding-left: 12px;
+    z-index: 110;
+  }
+  .row-cama-header th:last-child { border-right: none; }
 
-  /* PACIENTE ROW */
-  .tr-pac td {
+  /* Row 2: Paciente / Diagnostico — sticks below row 1 */
+  .row-pac td {
+    position: sticky;
+    top: 33px;
+    z-index: 90;
     background: var(--accent-light);
-    padding: 0;
     border-right: 1px solid var(--border);
     border-bottom: 2px solid var(--accent);
     vertical-align: top;
+    box-shadow: 0 4px 0 0 var(--accent-light), 0 6px 8px rgba(0,0,0,0.10);
   }
-  .tr-pac td:last-child { border-right: none; }
+  .row-pac td:first-child { z-index: 100; background: #dbeafe; }
+  .row-pac td:last-child { border-right: none; }
+
+  /* Row 3: Progreso — sticks below row 2 */
+  .tr-progress td {
+    position: sticky;
+    top: 85px;
+    z-index: 80;
+    background: var(--white);
+    box-shadow: 0 4px 0 0 var(--white), 0 6px 8px rgba(0,0,0,0.08);
+  }
+  .tr-progress td:first-child { z-index: 90; background: #f8fafc; }
+
   .td-label-pac {
-    background: #dbeafe;
+    background: #dbeafe !important;
     font-weight: 700; font-size: 10px;
     color: var(--accent);
     padding: 6px 8px;
     text-transform: uppercase; letter-spacing: 0.5px;
-    border-right: 1px solid var(--border) !important;
+    border-right: 2px solid var(--border) !important;
   }
   .pac-input {
     width: 100%; border: none; background: transparent;
     font-family: var(--font); font-size: 11px; color: var(--text);
-    padding: 4px 6px; resize: none; display: block;
+    padding: 4px 6px; display: block;
   }
   .pac-input:focus { outline: none; background: #fff; }
   .pac-cell { padding: 3px; }
 
+  /* PROGRESS ROW — extra props (padding/border only, sticky set above) */
+  .tr-progress td { padding: 4px 6px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .tr-progress td:last-child { border-right: none; }
+  .progress-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #16803c); border-radius: 3px; transition: width .35s ease; }
+  .progress-lbl { font-size: 9px; color: var(--muted); text-align: center; margin-top: 2px; }
+  .td-progress-label {
+    font-size: 10px; font-weight: 600;
+    color: var(--muted); padding: 4px 10px;
+    border-right: 2px solid var(--border) !important;
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+
   /* DOMAIN HEADER ROW */
   .tr-domain td {
-    padding: 6px 8px;
-    font-weight: 700; font-size: 11px;
+    padding: 6px 8px; font-weight: 700; font-size: 11px;
     border-right: 1px solid rgba(255,255,255,0.3);
     border-bottom: 1px solid rgba(255,255,255,0.2);
     text-align: center;
-    position: sticky;
-    letter-spacing: 0.3px;
   }
   .tr-domain td:last-child { border-right: none; }
   .td-domain-label {
-    text-align: left !important;
-    padding: 6px 10px !important;
+    text-align: left !important; padding: 6px 10px !important;
     display: flex; align-items: center; gap: 6px;
   }
   .domain-pill-sm {
@@ -148,44 +184,27 @@
 
   /* ITEM ROWS */
   .tr-item td {
-    padding: 0;
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    vertical-align: middle;
+    padding: 0; border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border); vertical-align: middle;
   }
   .tr-item td:last-child { border-right: none; }
   .tr-item:last-of-type td { border-bottom: 2px solid var(--border); }
 
-  /* LABEL COLUMN */
   .td-label {
-    background: #f8fafc;
-    padding: 7px 10px;
+    background: #f8fafc; padding: 7px 10px;
     font-size: 11px; font-weight: 500; color: var(--text);
     border-right: 2px solid var(--border) !important;
-    min-width: 220px; max-width: 260px;
-    line-height: 1.35;
+    min-width: 220px; max-width: 260px; line-height: 1.35;
   }
+  .td-cell { text-align: center; padding: 5px 3px; min-width: 88px; }
 
-  /* CELL WITH RADIO */
-  .td-cell {
-    text-align: center;
-    padding: 5px 3px;
-    min-width: 88px;
-  }
-
-  /* RADIO PILLS — compact */
-  .radio-group-col {
-    display: flex; flex-direction: column; gap: 3px;
-    align-items: stretch; padding: 3px 4px;
-  }
+  /* RADIO PILLS */
+  .radio-group-col { display: flex; flex-direction: column; gap: 3px; align-items: stretch; padding: 3px 4px; }
   .rpill input[type="radio"] { display: none; }
   .rpill label {
-    display: block; width: 100%;
-    padding: 3px 6px; border-radius: 12px;
-    border: 1.5px solid var(--border);
-    font-size: 10px; font-weight: 500; color: var(--muted);
-    cursor: pointer; transition: all .12s;
-    text-align: center; background: var(--bg);
+    display: block; width: 100%; padding: 3px 6px; border-radius: 12px;
+    border: 1.5px solid var(--border); font-size: 10px; font-weight: 500; color: var(--muted);
+    cursor: pointer; transition: all .12s; text-align: center; background: var(--bg);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .rpill label:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
@@ -194,11 +213,10 @@
   .rpill.red   input[type="radio"]:checked + label { background: #c0392b; border-color: #c0392b; }
   .rpill.yellow input[type="radio"]:checked + label { background: #b45309; border-color: #b45309; }
 
-  /* CHECKBOX — compact */
+  /* CHECKBOX */
   .chk-cell {
     display: flex; align-items: center; justify-content: center;
-    height: 100%; min-height: 36px; cursor: pointer;
-    transition: background .1s;
+    height: 100%; min-height: 36px; cursor: pointer; transition: background .1s;
   }
   .chk-cell:hover { background: #f0f9f4; }
   .chk-box {
@@ -211,65 +229,49 @@
   .chk-cell.done .chk-box { background: #16803c; border-color: #16803c; }
   .chk-cell.done .chk-box svg { display: block; }
 
-  /* OBSERVACIONES ROW */
-  .tr-obs td {
-    padding: 0;
-    border-right: 1px solid var(--border);
-    border-bottom: 2px solid var(--accent);
-    vertical-align: top;
+  /* TEXT INPUT CELL */
+  .txt-input {
+    width: 100%; border: none; border-bottom: 1px solid var(--border);
+    background: transparent; font-family: var(--font);
+    font-size: 11px; color: var(--text); padding: 6px 6px;
+    text-align: center;
   }
+  .txt-input:focus { outline: none; background: #fffde7; border-bottom-color: var(--accent); }
+  .txt-input::placeholder { color: #b0bec5; font-style: italic; }
+
+  /* ANTIDELIRIUM sub-checks */
+  .anti-cell { padding: 4px 6px; }
+  .anti-row {
+    display: flex; align-items: flex-start; gap: 5px;
+    padding: 2px 0; cursor: pointer;
+  }
+  .anti-row:hover .anti-box { border-color: var(--accent); }
+  .anti-box {
+    width: 14px; height: 14px; border-radius: 3px;
+    border: 1.5px solid var(--border); background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px; transition: all .12s;
+  }
+  .anti-box svg { display: none; }
+  .anti-row.done .anti-box { background: #6d28d9; border-color: #6d28d9; }
+  .anti-row.done .anti-box svg { display: block; }
+  .anti-row.done .anti-lbl { text-decoration: line-through; color: var(--muted); }
+  .anti-lbl { font-size: 9px; line-height: 1.3; color: var(--text); }
+
+  /* OBSERVACIONES ROW */
+  .tr-obs td { padding: 0; border-right: 1px solid var(--border); border-bottom: 2px solid var(--accent); vertical-align: top; }
   .tr-obs td:last-child { border-right: none; }
   .obs-label {
-    background: #fffbea;
-    font-weight: 700; font-size: 10px; color: #92400e;
+    background: #fffbea; font-weight: 700; font-size: 10px; color: #92400e;
     padding: 6px 10px; text-transform: uppercase; letter-spacing: 0.5px;
-    border-right: 2px solid var(--border) !important;
-    border-bottom: none !important;
+    border-right: 2px solid var(--border) !important; border-bottom: none !important;
   }
   .obs-textarea {
     width: 100%; border: none; background: transparent;
     font-family: var(--font); font-size: 11px; color: var(--text);
-    padding: 5px 6px; resize: none; min-height: 56px;
-    line-height: 1.4; display: block;
+    padding: 5px 6px; resize: none; min-height: 56px; line-height: 1.4; display: block;
   }
   .obs-textarea:focus { outline: none; background: #fffdf0; }
-
-  /* PROGRESS ROW */
-  .tr-progress td {
-    padding: 4px 6px;
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    background: var(--white);
-  }
-  .tr-progress td:last-child { border-right: none; }
-  .progress-track {
-    height: 5px; background: var(--border); border-radius: 3px; overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), #16803c);
-    border-radius: 3px; transition: width .35s ease;
-  }
-  .progress-lbl {
-    font-size: 9px; color: var(--muted); text-align: center; margin-top: 2px;
-  }
-  .td-progress-label {
-    background: #f8fafc; font-size: 10px; font-weight: 600;
-    color: var(--muted); padding: 4px 10px;
-    border-right: 2px solid var(--border) !important;
-    text-transform: uppercase; letter-spacing: 0.4px;
-  }
-
-  /* FOOTER */
-  footer {
-    text-align: center; padding: 20px 16px;
-    color: var(--muted); font-size: 11px;
-    border-top: 1px solid var(--border);
-    background: var(--white); line-height: 2;
-    margin-top: 8px;
-  }
-  footer a { color: var(--accent); text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
 
   @media(prefers-reduced-motion: reduce){ * { transition: none !important; } }
 </style>
@@ -282,7 +284,7 @@
       <div class="logo-circle">UCI</div>
       <div class="header-text">
         <h1>«GASTELE UN DIA»</h1>
-        <p>Lista de Chequeo para Ronda Médica UCI · 10 Camas</p>
+        <p>Lista de Chequeo para Ronda Médica UCI</p>
       </div>
     </div>
     <div class="header-badges">
@@ -311,19 +313,22 @@
   <table id="main-table"></table>
 </div>
 
-<footer>
-  Fonseca-Ruiz NJ, Duque-Pérez JJ, Bello-Muñoz C.<br>
-  <em>Acta Colombiana de Cuidado Intensivo</em> 2024;24:45–54 · Universidad de Cartagena · UCI<br>
-  <a href="https://diegoocb.github.io/ExPreS/" target="_blank">ExPreS Score Calculator →</a>
-</footer>
-
 <script>
+const ANTI_ITEMS = [
+  { id:'anti1', label:'Reorientación cognitiva: reloj, calendario, fotos y objetos familiares' },
+  { id:'anti2', label:'Optimización ciclo sueño-vigilia: reducir ruido nocturno, disminuir luz nocturna, exposición a luz natural' },
+  { id:'anti3', label:'Movilización temprana' },
+  { id:'anti4', label:'Corrección de déficit sensorial: gafas, audífonos' },
+  { id:'anti5', label:'Participación familiar: visita extendida' },
+  { id:'anti6', label:'Retiro de dispositivos invasivos innecesarios: sonda vesical, SoG, catéteres, restricciones físicas' },
+  { id:'anti7', label:'Vigilia diurna' },
+];
+
 const DOMINIOS = [
   {
     id:'G', letra:'G', nombre:'Glucometrías', color:'#16803c', bg:'#dcfce7',
     items:[
-      { id:'g1', tipo:'radio', label:'¿Glucemia en meta (110–180 mg/dL)?',
-        opts:['Sí','No','No aplica'], cols:['green','red',''] },
+      { id:'g1', tipo:'radio', label:'¿Glucemia en meta (110–180 mg/dL)?', opts:['Sí','No','No aplica'], cols:['green','red',''] },
       { id:'g2', tipo:'check', label:'≥2 glucometrías >180 mg/dL' },
       { id:'g3', tipo:'check', label:'Hipoglucemia (<70 mg/dL)' },
     ]
@@ -331,29 +336,25 @@ const DOMINIOS = [
   {
     id:'A0', letra:'Á', nombre:'Analgesia', color:'#b45309', bg:'#fef3c7',
     items:[
-      { id:'a1', tipo:'radio', label:'Escala EVA/VAS (consciente)',
-        opts:['0–3','4–6','7–10','No aplica'], cols:['green','yellow','red',''] },
-      { id:'a2', tipo:'radio', label:'CPOT (Intubado)',
-        opts:['0–2','3–4','5–8','No aplica'], cols:['green','yellow','red',''] },
+      { id:'a1', tipo:'radio', label:'Escala EVA/VAS (consciente)', opts:['0–3','4–6','7–10','No aplica'], cols:['green','yellow','red',''] },
+      { id:'a2', tipo:'radio', label:'CPOT (Intubado)', opts:['0–2','3–4','5–8','No aplica'], cols:['green','yellow','red',''] },
+      { id:'a_farmaco', tipo:'text', label:'Fármaco analgésico activo', placeholder:'Ej: Morfina, Tramadol...' },
       { id:'a3', tipo:'check', label:'Estrategia multimodal activa' },
     ]
   },
   {
     id:'S', letra:'S', nombre:'Sedación & Delirium', color:'#6d28d9', bg:'#ede9fe',
     items:[
-      { id:'s1', tipo:'radio', label:'RASS 0 a −2',
-        opts:['Sí (meta)','No — profundo','No aplica'], cols:['green','red',''] },
-      { id:'s2', tipo:'check', label:'Sedación profunda — revisar' },
-      { id:'s3', tipo:'radio', label:'CAM-ICU ≥1 vez/turno',
-        opts:['Negativo','Positivo','No aplica'], cols:['green','red',''] },
-      { id:'s4', tipo:'check', label:'Medidas no farmacológicas' },
+      { id:'s1', tipo:'radio', label:'RASS 0 a −2', opts:['Sí (meta)','No (Profundo)','No aplica'], cols:['green','red',''] },
+      { id:'s2', tipo:'check', label:'¿Amerita sedación profunda?' },
+      { id:'s3', tipo:'radio', label:'CAM-ICU ≥1 vez/turno', opts:['Negativo','Positivo','No aplica'], cols:['green','red',''] },
+      { id:'s4', tipo:'antidelirium', label:'Medidas antidelirium activas' },
     ]
   },
   {
     id:'T', letra:'T', nombre:'Tromboprofilaxis', color:'#0e7490', bg:'#cffafe',
     items:[
-      { id:'t1', tipo:'radio', label:'¿Recibiendo profilaxis TEV?',
-        opts:['Sí','No — justif.','No — s/justif.'], cols:['green','yellow','red'] },
+      { id:'t1', tipo:'radio', label:'¿Recibiendo profilaxis TEV?', opts:['Sí','No (Justificado)','No (No justificado)'], cols:['green','yellow','red'] },
       { id:'t2', tipo:'check', label:'Sin riesgo → HBPM preferida' },
       { id:'t3', tipo:'check', label:'ClCr <30 → HNF / dalteparina' },
       { id:'t4', tipo:'check', label:'Alto riesgo → mecánica (CNI)' },
@@ -369,31 +370,23 @@ const DOMINIOS = [
   {
     id:'L', letra:'L', nombre:'Liberación VM', color:'#16803c', bg:'#dcfce7',
     items:[
-      { id:'l1', tipo:'radio', label:'¿Cumple criterios PRE?',
-        opts:['Sí','No','No aplica'], cols:['green','red',''] },
-      { id:'l2', tipo:'radio', label:'PRE/SBT programada hoy',
-        opts:['Sí','No','No aplica'], cols:['green','red',''] },
-      { id:'l3', tipo:'radio', label:'Tolera PRE → extubación',
-        opts:['Sí','No','No aplica'], cols:['green','red',''] },
+      { id:'l1', tipo:'radio', label:'¿Cumple criterios PRE?', opts:['Sí','No','No aplica'], cols:['green','red',''] },
+      { id:'l2', tipo:'radio', label:'PRE/SBT programada hoy', opts:['Sí','No','No aplica'], cols:['green','red',''] },
+      { id:'l3', tipo:'radio', label:'Tolera PRE → extubación', opts:['Sí','No','No aplica'], cols:['green','red',''] },
     ]
   },
   {
     id:'E2', letra:'E', nombre:'Evacuación intestinal', color:'#c2410c', bg:'#ffedd5',
     items:[
-      { id:'e2a', tipo:'radio', label:'Deposición en últimas 48 h',
-        opts:['Sí','No — tratar'], cols:['green','red'] },
-      { id:'e2b', tipo:'radio', label:'Laxante profiláctico activo',
-        opts:['Sí','No','No aplica'], cols:['green','red',''] },
-      { id:'e2c', tipo:'radio', label:'¿Descartó obstrucción?',
-        opts:['Sí','Pendiente','No aplica'], cols:['green','yellow',''] },
+      { id:'e2a', tipo:'radio', label:'Deposición en últimas 48 h', opts:['Sí','No'], cols:['green','red'] },
+      { id:'e2b', tipo:'radio', label:'Laxante profiláctico activo', opts:['Sí','No','No aplica'], cols:['green','red',''] },
+      { id:'e2c', tipo:'radio', label:'¿Descartó obstrucción?', opts:['Sí','Pendiente','No aplica'], cols:['green','yellow',''] },
     ]
   },
   {
     id:'U', letra:'U', nombre:'Úlceras & Prot. gástrica', color:'#be185d', bg:'#fce7f3',
     items:[
-      { id:'u1', tipo:'radio', label:'Escala de Braden',
-        opts:['≤12','13–14','15–16','17–18','N/A'],
-        cols:['red','yellow','green','green',''] },
+      { id:'u1', tipo:'radio', label:'Escala de Braden', opts:['≤12','13–14','15–16','17–18','N/A'], cols:['red','yellow','green','green',''] },
       { id:'u2', tipo:'check', label:'Rotación postural c/2 h' },
       { id:'u3', tipo:'check', label:'Profilaxis gástrica activa' },
     ]
@@ -401,56 +394,40 @@ const DOMINIOS = [
   {
     id:'N', letra:'N', nombre:'Nutrición', color:'#3730a3', bg:'#e0e7ff',
     items:[
-      { id:'n1', tipo:'radio', label:'Indicación de VO',
-        opts:['Sí','No aplica'], cols:['green',''] },
-      { id:'n2', tipo:'radio', label:'Indicación de NE',
-        opts:['Sí','No aplica'], cols:['green',''] },
-      { id:'n3', tipo:'radio', label:'Indicación de NPT',
-        opts:['Sí','No aplica'], cols:['yellow',''] },
+      { id:'n1', tipo:'radio', label:'Indicación de VO', opts:['Sí','No aplica'], cols:['green',''] },
+      { id:'n2', tipo:'radio', label:'Indicación de NE', opts:['Sí','No aplica'], cols:['green',''] },
+      { id:'n3', tipo:'radio', label:'Indicación de NPT', opts:['Sí','No aplica'], cols:['yellow',''] },
       { id:'n4', tipo:'radio', label:'Estado nutricional',
-        opts:['Con nutrición','Sin nutric. justif.','Sin nutric. injustif.'], cols:['green','yellow','red'] },
+        opts:['Con nutrición','Sin nutric. JUSTIF.','Sin nutric. NO JUSTIF.'], cols:['green','yellow','red'] },
     ]
   },
   {
     id:'D', letra:'D', nombre:'Diuresis', color:'#0e7490', bg:'#e0f2fe',
     items:[
-      { id:'d1', tipo:'radio', label:'Gasto urinario',
-        opts:['>0.5 mL/kg/h','Oliguria','Anuria','N/A'], cols:['green','yellow','red',''] },
-      { id:'d2', tipo:'radio', label:'Perfusión/volemia evaluada',
-        opts:['Sí','Pendiente','No aplica'], cols:['green','red',''] },
-      { id:'d3', tipo:'radio', label:'Tendencia creatinina/BUN',
-        opts:['Estable','En ascenso','No aplica'], cols:['green','red',''] },
+      { id:'d1', tipo:'radio', label:'Gasto urinario', opts:['>0.5 mL/kg/h','Oliguria','Anuria','N/A'], cols:['green','yellow','red',''] },
+      { id:'d2', tipo:'radio', label:'Perfusión/volemia evaluada', opts:['Sí','Pendiente','No aplica'], cols:['green','red',''] },
+      { id:'d3', tipo:'radio', label:'Tendencia creatinina/BUN', opts:['Estable','En ascenso','No aplica'], cols:['green','red',''] },
     ]
   },
   {
     id:'I', letra:'I', nombre:'Invasiones', color:'#1a56a0', bg:'#dbeafe',
     items:[
-      { id:'i1', tipo:'radio', label:'¿Indicación CVC?',
-        opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
-      { id:'i2', tipo:'radio', label:'¿Indicación línea arterial?',
-        opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
-      { id:'i3', tipo:'radio', label:'¿Indicación sonda vesical?',
-        opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
-      { id:'i4', tipo:'radio', label:'¿Indicación SNG/SNO?',
-        opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
-      { id:'i5', tipo:'radio', label:'¿Indicación IOT?',
-        opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
+      { id:'i1', tipo:'radio', label:'¿Indicación CVC?', opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
+      { id:'i2', tipo:'radio', label:'¿Indicación línea arterial?', opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
+      { id:'i3', tipo:'radio', label:'¿Indicación sonda vesical?', opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
+      { id:'i4', tipo:'radio', label:'¿Indicación SNG/SNO?', opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
+      { id:'i5', tipo:'radio', label:'¿Indicación IOT?', opts:['Sí','No — retirar','N/A'], cols:['green','red',''] },
       { id:'i6', tipo:'check', label:'Inspección sitios inserción' },
     ]
   },
   {
     id:'AB', letra:'A', nombre:'Antibióticos', color:'#065f46', bg:'#d1fae5',
     items:[
-      { id:'ab1', tipo:'radio', label:'Uso de antibiótico',
-        opts:['Sí','No','N/A'], cols:['yellow','green',''] },
-      { id:'ab2', tipo:'radio', label:'Foco infeccioso identificado',
-        opts:['Sí','No — buscar','N/A'], cols:['green','red',''] },
-      { id:'ab3', tipo:'radio', label:'Cultivos para ATB dirigida',
-        opts:['Dirigida','Pendiente','Empírico','N/A'], cols:['green','yellow','red',''] },
-      { id:'ab4', tipo:'radio', label:'Ajuste ATB',
-        opts:['Ajustado','Pendiente','N/A'], cols:['green','yellow',''] },
-      { id:'ab5', tipo:'radio', label:'Control del foco',
-        opts:['Logrado','Pendiente','N/A'], cols:['green','yellow',''] },
+      { id:'ab1', tipo:'radio', label:'Uso de antibiótico', opts:['Sí','No','N/A'], cols:['yellow','green',''] },
+      { id:'ab2', tipo:'radio', label:'Foco infeccioso identificado', opts:['Sí','No — buscar','N/A'], cols:['green','red',''] },
+      { id:'ab3', tipo:'radio', label:'Cultivos para ATB dirigida', opts:['Dirigida','Pendiente','Empírico','N/A'], cols:['green','yellow','red',''] },
+      { id:'ab4', tipo:'radio', label:'Ajuste ATB', opts:['Ajustado','Pendiente','N/A'], cols:['green','yellow',''] },
+      { id:'ab5', tipo:'radio', label:'Control del foco', opts:['Logrado','Pendiente','N/A'], cols:['green','yellow',''] },
     ]
   },
 ];
@@ -459,34 +436,47 @@ const NUM_CAMAS = 10;
 let state = {};
 
 function initState() {
-  const saved = localStorage.getItem('gastele_v4');
+  const saved = localStorage.getItem('gastele_v5');
   if (saved) { try { state = JSON.parse(saved); return; } catch(e){} }
   state = { fecha:'', turno:'', medico:'', camas:{} };
   for (let c=1; c<=NUM_CAMAS; c++) {
-    state.camas[c] = { paciente:'', dx:'', obs:'', vals:{} };
+    state.camas[c] = { paciente:'', dx:'', obs:'', vals:{}, anti:{} };
   }
 }
 
-function saveState() { localStorage.setItem('gastele_v4', JSON.stringify(state)); }
+function saveState() { localStorage.setItem('gastele_v5', JSON.stringify(state)); }
 
 function resetAll() {
-  if (!confirm('¿Reiniciar todos los datos de la ronda? Esta acción no se puede deshacer.')) return;
-  localStorage.removeItem('gastele_v4');
+  if (!confirm('¿Reiniciar todos los datos? Esta acción no se puede deshacer.')) return;
+  localStorage.removeItem('gastele_v5');
   location.reload();
 }
 
 function allItemIds() {
-  return DOMINIOS.flatMap(d => d.items.map(it => it.id));
+  let ids = [];
+  DOMINIOS.forEach(d => d.items.forEach(it => {
+    if (it.tipo !== 'antidelirium') ids.push(it.id);
+    else ANTI_ITEMS.forEach(a => ids.push('anti_'+it.id+'_'+a.id));
+  }));
+  return ids;
 }
 
 function getCamaProgress(cid) {
-  const vals = state.camas[cid].vals;
-  const ids = allItemIds();
-  return { total: ids.length, done: ids.filter(id => vals[id]).length };
-}
-
-function domainDone(cid, d) {
-  return d.items.filter(it => state.camas[cid].vals[it.id]).length;
+  const cam = state.camas[cid];
+  let total = 0, done = 0;
+  DOMINIOS.forEach(d => d.items.forEach(it => {
+    if (it.tipo === 'text') return;
+    if (it.tipo === 'antidelirium') {
+      ANTI_ITEMS.forEach(a => {
+        total++;
+        if (cam.anti && cam.anti[it.id+'_'+a.id]) done++;
+      });
+    } else {
+      total++;
+      if (cam.vals[it.id]) done++;
+    }
+  }));
+  return { total, done };
 }
 
 function updateProgressBar(cid) {
@@ -501,32 +491,32 @@ function buildTable() {
   const table = document.getElementById('main-table');
   const camas = Array.from({length: NUM_CAMAS}, (_,i) => i+1);
 
-  // ROW 1: headers
+  // ROW 1: cama headers — sticky top:0
   const trHead = document.createElement('tr');
+  trHead.className = 'row-cama-header';
   const thLabel = document.createElement('th');
-  thLabel.className = 'th-cama';
-  thLabel.style.cssText = 'background:#0f3d75;min-width:220px;text-align:left;padding-left:12px;';
-  thLabel.textContent = 'Ítem a verificar en ronda';
+  thLabel.style.cssText = 'background:#0f3d75;min-width:220px;text-align:left;padding-left:12px;top:0;';
+  thLabel.textContent = 'Ítem a verificar';
   trHead.appendChild(thLabel);
   camas.forEach(c => {
     const th = document.createElement('th');
-    th.className = 'th-cama';
     th.textContent = `Cama ${c}`;
     trHead.appendChild(th);
   });
   table.appendChild(trHead);
 
-  // ROW 2: paciente
+  // ROW 2: paciente — sticky top:33px
   const trPac = document.createElement('tr');
-  trPac.className = 'tr-pac';
+  trPac.className = 'row-pac';
   const tdPacLabel = document.createElement('td');
   tdPacLabel.className = 'td-label-pac';
-  tdPacLabel.style.cssText = 'padding:8px 10px;';
+  tdPacLabel.style.cssText = '';
   tdPacLabel.innerHTML = '🛏 Paciente / Diagnóstico';
   trPac.appendChild(tdPacLabel);
   camas.forEach(c => {
     const td = document.createElement('td');
     td.className = 'pac-cell';
+    /* top handled by CSS */
     td.innerHTML = `
       <input class="pac-input" placeholder="Paciente..." data-cama="${c}" data-field="paciente" value="${state.camas[c].paciente||''}">
       <input class="pac-input" placeholder="Diagnóstico..." data-cama="${c}" data-field="dx" value="${state.camas[c].dx||''}" style="border-top:1px solid var(--border);margin-top:2px;">
@@ -556,7 +546,7 @@ function buildTable() {
 
   // DOMAINS + ITEMS
   DOMINIOS.forEach(d => {
-    // Domain header row
+    // Domain header
     const trDom = document.createElement('tr');
     trDom.className = 'tr-domain';
     trDom.style.background = d.bg;
@@ -572,18 +562,16 @@ function buildTable() {
     });
     table.appendChild(trDom);
 
-    // Item rows
+    // Items
     d.items.forEach(it => {
       const trItem = document.createElement('tr');
       trItem.className = 'tr-item';
 
-      // Label
       const tdLbl = document.createElement('td');
       tdLbl.className = 'td-label';
       tdLbl.innerHTML = `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${d.color};margin-right:5px;vertical-align:middle;flex-shrink:0"></span>${it.label}`;
       trItem.appendChild(tdLbl);
 
-      // Cells per cama
       camas.forEach(c => {
         const td = document.createElement('td');
         td.className = 'td-cell';
@@ -599,12 +587,48 @@ function buildTable() {
             pill.className = `rpill ${cc}`;
             pill.innerHTML = `
               <input type="radio" name="r_${c}_${it.id}" id="${uid}" value="${op}" ${val===op?'checked':''} data-cama="${c}" data-item="${it.id}">
-              <label for="${uid}" title="${op}">${op}</label>
-            `;
+              <label for="${uid}" title="${op}">${op}</label>`;
             grp.appendChild(pill);
           });
           td.appendChild(grp);
+
+        } else if (it.tipo === 'text') {
+          const inp = document.createElement('input');
+          inp.type = 'text';
+          inp.className = 'txt-input';
+          inp.placeholder = it.placeholder || '';
+          inp.value = state.camas[c].vals[it.id] || '';
+          inp.dataset.cama = c;
+          inp.dataset.item = it.id;
+          inp.addEventListener('input', e => {
+            state.camas[parseInt(e.target.dataset.cama)].vals[e.target.dataset.item] = e.target.value;
+            saveState();
+          });
+          td.appendChild(inp);
+
+        } else if (it.tipo === 'antidelirium') {
+          const wrap = document.createElement('div');
+          wrap.className = 'anti-cell';
+          ANTI_ITEMS.forEach(a => {
+            const key = it.id+'_'+a.id;
+            const done = state.camas[c].anti && state.camas[c].anti[key];
+            const row = document.createElement('div');
+            row.className = 'anti-row' + (done?' done':'');
+            row.id = `anti-${c}-${key}`;
+            row.innerHTML = `
+              <div class="anti-box">
+                <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                  <path d="M1 4.5l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <span class="anti-lbl">${a.label}</span>`;
+            row.onclick = () => toggleAnti(c, it.id, a.id);
+            wrap.appendChild(row);
+          });
+          td.appendChild(wrap);
+
         } else {
+          // checkbox
           const done = val === 'yes';
           const div = document.createElement('div');
           div.className = `chk-cell${done?' done':''}`;
@@ -614,8 +638,7 @@ function buildTable() {
           div.innerHTML = `<div class="chk-box">
             <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
               <path d="M1.5 5.5l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>`;
+            </svg></div>`;
           div.onclick = () => toggleCheck(parseInt(div.dataset.cama), div.dataset.item);
           td.appendChild(div);
         }
@@ -626,7 +649,7 @@ function buildTable() {
     });
   });
 
-  // OBSERVACIONES ROW
+  // OBSERVACIONES
   const trObs = document.createElement('tr');
   trObs.className = 'tr-obs';
   const tdObsLabel = document.createElement('td');
@@ -650,27 +673,20 @@ function buildTable() {
   });
   table.appendChild(trObs);
 
-  // Bind events
   bindEvents();
 }
 
 function bindEvents() {
-  // Paciente inputs
   document.querySelectorAll('.pac-input').forEach(inp => {
     inp.addEventListener('input', e => {
-      const cid = parseInt(e.target.dataset.cama);
-      const field = e.target.dataset.field;
-      state.camas[cid][field] = e.target.value;
+      state.camas[parseInt(e.target.dataset.cama)][e.target.dataset.field] = e.target.value;
       saveState();
     });
   });
-
-  // Radio buttons
   document.querySelectorAll('input[type="radio"]').forEach(r => {
     r.addEventListener('change', e => {
       const cid = parseInt(e.target.dataset.cama);
-      const iid = e.target.dataset.item;
-      state.camas[cid].vals[iid] = e.target.value;
+      state.camas[cid].vals[e.target.dataset.item] = e.target.value;
       saveState();
       updateProgressBar(cid);
     });
@@ -683,6 +699,16 @@ function toggleCheck(cid, iid) {
   saveState();
   const el = document.getElementById(`cr-${cid}-${iid}`);
   if (el) el.className = 'chk-cell'+(state.camas[cid].vals[iid]==='yes'?' done':'');
+  updateProgressBar(cid);
+}
+
+function toggleAnti(cid, itId, aId) {
+  const key = itId+'_'+aId;
+  if (!state.camas[cid].anti) state.camas[cid].anti = {};
+  state.camas[cid].anti[key] = !state.camas[cid].anti[key];
+  saveState();
+  const el = document.getElementById(`anti-${cid}-${key}`);
+  if (el) el.className = 'anti-row'+(state.camas[cid].anti[key]?' done':'');
   updateProgressBar(cid);
 }
 
@@ -701,6 +727,7 @@ function init() {
   initState();
   buildTable();
   initGlobal();
+  for (let c=1;c<=NUM_CAMAS;c++) updateProgressBar(c);
 }
 
 init();
