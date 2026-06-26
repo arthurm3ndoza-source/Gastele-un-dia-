@@ -67,6 +67,97 @@
     padding: 3px 10px; border-radius: 5px; cursor: pointer;
   }
   .btn-reset:hover { border-color: #c0392b; color: #c0392b; }
+  .btn-download {
+    background: transparent;
+    border: 1px solid #16803c; color: #16803c;
+    font-family: var(--font); font-size: 11px;
+    padding: 3px 10px; border-radius: 5px; cursor: pointer;
+    margin-left: auto;
+  }
+  .btn-download:hover { background: #16803c; color: #fff; }
+
+  /* ── PRINT STYLES ─────────────────────────────────────────── */
+  @media print {
+    @page { size: A3 landscape; margin: 8mm; }
+
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    /* Hide interactive elements */
+    header .meta-bar,
+    .btn-download,
+    .btn-reset { display: none !important; }
+
+    /* Header — keep but compact */
+    header {
+      position: relative !important;
+      box-shadow: none !important;
+      border-bottom: 2px solid var(--accent) !important;
+      padding: 0 !important;
+    }
+    .header-top { padding: 6px 12px !important; }
+
+    /* Table wrapper — remove scroll, show full table */
+    .table-wrap {
+      overflow: visible !important;
+      max-height: none !important;
+      padding: 0 !important;
+      height: auto !important;
+    }
+
+    /* Table — full width, smaller font */
+    table {
+      width: 100% !important;
+      min-width: unset !important;
+      font-size: 8px !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      page-break-inside: auto;
+    }
+
+    /* Unstick all sticky rows for print */
+    .row-cama-header th,
+    .row-pac td,
+    .tr-progress td {
+      position: relative !important;
+      top: auto !important;
+      box-shadow: none !important;
+    }
+
+    /* Compact cells */
+    .row-cama-header th { padding: 4px 2px !important; font-size: 8px !important; }
+    .td-label { min-width: 120px !important; max-width: 150px !important; padding: 3px 5px !important; font-size: 8px !important; }
+    .td-cell { min-width: 60px !important; padding: 2px !important; }
+    .pac-input { font-size: 8px !important; padding: 2px 4px !important; }
+    .pac-cell { padding: 2px !important; }
+
+    /* Radio pills — compact for print */
+    .rpill label { padding: 2px 4px !important; font-size: 7px !important; border-radius: 8px !important; }
+    .radio-group-col { gap: 2px !important; padding: 2px !important; }
+
+    /* Checkboxes */
+    .chk-cell { min-height: 20px !important; }
+    .chk-box { width: 14px !important; height: 14px !important; }
+
+    /* Antidelirium */
+    .anti-lbl { font-size: 7px !important; }
+    .anti-box { width: 10px !important; height: 10px !important; }
+    .anti-cell { padding: 2px 4px !important; }
+
+    /* Domain headers */
+    .tr-domain td { padding: 3px 6px !important; font-size: 8px !important; }
+    .domain-pill-sm { width: 16px !important; height: 16px !important; font-size: 9px !important; }
+
+    /* Progress */
+    .progress-track { height: 3px !important; }
+    .progress-lbl { font-size: 7px !important; }
+
+    /* Observaciones */
+    .obs-textarea { min-height: 30px !important; font-size: 8px !important; }
+    .obs-label { font-size: 8px !important; padding: 3px 6px !important; }
+
+    /* Avoid breaking domain rows across pages */
+    .tr-domain, .tr-item { page-break-inside: avoid; }
+  }'}}
 
   /* TABLE WRAPPER */
   .table-wrap {
@@ -305,7 +396,7 @@
       <label>Médico:</label>
       <input type="text" id="medico-global" placeholder="Nombre del médico" style="width:160px">
     </div>
-    <button class="btn-reset" style="border-color:#16803c;color:#16803c;" onclick="window.print()">⬇ Descargar </button>
+    <button class="btn-download" onclick="window.print()">⬇ Descargar</button>
     <button class="btn-reset" onclick="resetAll()">↺ Reiniciar</button>
   </div>
 </header>
